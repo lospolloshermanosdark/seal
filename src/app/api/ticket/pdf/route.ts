@@ -189,7 +189,7 @@ export async function GET(req: Request) {
     });
 
     // Exportar PDF
-    const pdfBytes = await pdf.save();
+    const pdfBytes = await pdf.save() as any;
 
     return new NextResponse(pdfBytes, {
       status: 200,
