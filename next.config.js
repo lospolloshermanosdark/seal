@@ -8,7 +8,8 @@ const nextConfig = {
       "images.unsplash.com",
       "ext.same-assets.com",
       "ugc.same-assets.com",
-      "eventim.com.br"
+      "eventim.com.br",
+      "res.cloudinary.com"
     ],
     remotePatterns: [
       {

@@ -1,0 +1,118 @@
+/* Container geral */
+.mp-container {
+  background: #f6f7fb;
+  min-height: 100vh;
+  padding-bottom: 60px;
+}
+
+/* Wrapper central */
+.mp-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+/* Títulos */
+.mp-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #0a0a0a;
+  margin-bottom: 8px;
+}
+
+.mp-subtitle {
+  font-size: 16px;
+  color: #444;
+  margin-bottom: 30px;
+}
+
+/* Estado vazio */
+.mp-empty {
+  background: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  text-align: center;
+  color: #666;
+}
+
+/* Lista de pedidos */
+.mp-list {
+  display: grid;
+  gap: 20px;
+}
+
+/* Card do pedido */
+.mp-card {
+  background: white;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border: 1px solid #e1e1e1;
+}
+
+/* Header do card */
+.mp-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mp-order-id {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+}
+
+/* Status */
+.mp-status {
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.mp-paid {
+  background: #d4f8d4;
+  color: #0b7a0b;
+}
+
+.mp-pending {
+  background: #fff3d1;
+  color: #8a6d00;
+}
+
+/* Detalhes */
+.mp-item {
+  margin: 10px 0;
+  color: #333;
+}
+
+/* Botões */
+.mp-button {
+  background: #0b1e61;
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 15px;
+}
+
+.mp-button:hover {
+  background: #132c8a;
+}
+
+.mp-pay {
+  background: #e10600 !important;
+}
+
+.mp-pay:hover {
+  background: #ff2a21 !important;
+}
+
+/* Carregamento */
+.mp-loading {
+  padding: 40px;
+  text-align: center;
+}

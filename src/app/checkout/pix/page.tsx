@@ -21,7 +21,9 @@ export default function PixPage() {
   const router = useRouter();
   const [copied, setCopied] = useState(false);
 
-  // ===== PEGAR CARRINHO E CLIENTE DO LOCALSTORAGE =====
+  // ============================
+  // PEGAR CARRINHO + CLIENTE
+  // ============================
   const cart =
     typeof window !== "undefined"
       ? JSON.parse(localStorage.getItem("cart") || "null")
@@ -36,35 +38,50 @@ export default function PixPage() {
     if (!cart || !customer) router.push("/checkout");
   }, []);
 
-  // ====== VALORES DO PEDIDO ======
+  // ============================
+  // PEDIDO SALVO
+  // ============================
+  const savedOrder =
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("currentOrder") || "null")
+      : null;
+
+  const externalRef =
+    savedOrder?.externalRef ?? `PED-${Date.now().toString().slice(-6)}`;
+
+  // ============================
+  // VALORES
+  // ============================
   const TEST_AMOUNT = process.env.NEXT_PUBLIC_PIX_TEST_AMOUNT
     ? Number(process.env.NEXT_PUBLIC_PIX_TEST_AMOUNT)
     : null;
 
-  // 🔥 Se existir valor de testes → usa ele
   const amount = TEST_AMOUNT ? TEST_AMOUNT : (cart?.total ?? 0) * 100;
-
   const title = cart?.nome ?? "Pedido";
 
-  const orderNumber = `PED-${Date.now().toString().slice(-6)}`;
-
-  // ====== ESTADOS ======
+  // ============================
+  // ESTADOS
+  // ============================
   const [loading, setLoading] = useState(true);
   const [pixData, setPixData] = useState<PixResponse | null>(null);
   const [qrImage, setQrImage] = useState<string | null>(null);
   const [paid, setPaid] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const [hasCreatedPix, setHasCreatedPix] = useState(false);
 
+  // ============================
+  // BODY DO PIX
+  // ============================
   const body = useMemo(
     () => ({
-      amount: Number(amount), // ✔ número
-      paymentMethod: "pix", // ✔ igual ao body do Insomnia
-      provider: "gatware", // ✔ obrigatório no PagLoop
-      transactionType: "DEPOSIT", // ✔ igual seu fluxo n8n
-      description: `Pagamento do pedido ${orderNumber}`,
-      callbackUrl: "https://eventim-ofertas.site/api/postback",
+      amount: Number(amount),
+      paymentMethod: "pix",
+      provider: "gatware",
+      transactionType: "DEPOSIT",
+      description: `Pagamento do pedido ${externalRef}`,
+      callbackUrl: "https://davin-debonair-avidly.ngrok-free.dev/api/postback",
+
+      externalRef,
 
       customer: {
         name: customer?.firstName + " " + customer?.lastName,
@@ -80,10 +97,8 @@ export default function PixPage() {
           title,
           unitPrice: Number(amount),
           name: "Serviço",
-          description: `Pagamento do pedido ${orderNumber}`,
-          price_amount: {
-            value: Number(amount),
-          },
+          description: `Pagamento do pedido ${externalRef}`,
+          price_amount: { value: Number(amount) },
           quantity: cart?.quantity ?? 1,
           tangible: false,
         },
@@ -92,14 +107,12 @@ export default function PixPage() {
     [amount, cart, customer]
   );
 
-  const savedOrder =
-    typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("currentOrder") || "null")
-      : null;
-
+  // ============================
+  // RESTAURAR PEDIDO PENDENTE
+  // ============================
   useEffect(() => {
     if (savedOrder && savedOrder.status === "pending") {
-      setHasCreatedPix(true); // evita recriar
+      setHasCreatedPix(true);
 
       setPixData({
         id: savedOrder.pix_id,
@@ -110,10 +123,8 @@ export default function PixPage() {
         },
       });
 
-      // recriar imagem do QR
       QRCode.toDataURL(savedOrder.pix_qrcode, { width: 1080 }).then(setQrImage);
 
-      // iniciar polling novamente
       const interval = setInterval(async () => {
         const chk = await fetch(`/api/pix/check?id=${savedOrder.pix_id}`);
         const json = await chk.json();
@@ -125,13 +136,13 @@ export default function PixPage() {
         }
       }, 3000);
 
-      return; // impede recriar o pedido
+      return;
     }
   }, []);
 
-  // =======================================================
-  // GERAR PIX + SALVAR PEDIDO
-  // =======================================================
+  // ============================
+  // CRIAR PIX + SALVAR PEDIDO
+  // ============================
   useEffect(() => {
     if (hasCreatedPix) return;
     setHasCreatedPix(true);
@@ -159,24 +170,30 @@ export default function PixPage() {
           setQrImage(img);
         }
 
+        // 🔥 GRAVAR PEDIDO COM customer_id
         await fetch("/api/order/create", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            externalRef: orderNumber,
+            externalRef,
             amount,
             title,
+
+            customer_name: customer?.firstName + " " + customer?.lastName,
+            customer_email: customer?.email,
+            customer_cpf: customer?.cpf?.replace(/\D/g, "") ?? "",
+
             payment_status: "pending",
             pix_id: pix.id,
             pix_qrcode: pix.pix?.qrcode ?? null,
-            cart,
-            customer,
           }),
         });
+
+        // SALVAR LOCAL
         localStorage.setItem(
           "currentOrder",
           JSON.stringify({
-            orderNumber,
+            externalRef,
             pix_id: pix.id,
             pix_qrcode: pix.pix?.qrcode ?? "",
             amount,
@@ -186,7 +203,7 @@ export default function PixPage() {
           })
         );
 
-        // polling
+        // POLLING
         const interval = setInterval(async () => {
           try {
             const chk = await fetch(`/api/pix/check?id=${pix.id}`);
@@ -197,7 +214,7 @@ export default function PixPage() {
               setPaid(true);
               setTimeout(() => router.push("/checkout/success"), 1200);
             }
-          } catch {}
+          } catch { }
         }, 3000);
       } catch (e: any) {
         setError(e.message);
@@ -211,6 +228,7 @@ export default function PixPage() {
       mounted = false;
     };
   }, []);
+
 
   return (
     <>
@@ -333,7 +351,7 @@ export default function PixPage() {
               </h2>
 
               <div className="order-tag">
-                Pedido: <strong>{orderNumber}</strong>
+                Pedido: <strong>{externalRef}</strong>
               </div>
 
               <p style={{ marginTop: 10, textAlign: "center" }}>

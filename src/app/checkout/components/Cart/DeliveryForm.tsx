@@ -189,24 +189,23 @@ const DeliveryForm = forwardRef<DeliveryFormRef, DeliveryFormProps>(
         const digits = onlyDigits(v);
 
         if (!digits) {
-          // campo vazio → exige preenchimento
           setErrors((p) => ({ ...p, cpf: "Informe o CPF." }));
           return;
         }
 
         if (digits.length < 11) {
-          // não mostra erro até ter 11 dígitos
           setErrors((p) => ({ ...p, cpf: "CPF incompleto." }));
           return;
         }
 
-        // 11 dígitos → valida corretamente
-        if (!validarCPF(v)) {
+        // valida usando APENAS dígitos
+        if (!validarCPF(digits)) {
           setErrors((p) => ({ ...p, cpf: "CPF inválido." }));
         } else {
           clearError("cpf");
         }
       }
+
 
       if (field === "phone") {
         if (!validarTelefone(v))
@@ -291,10 +290,9 @@ const DeliveryForm = forwardRef<DeliveryFormRef, DeliveryFormProps>(
       const masked = maskCPF(raw);
       setField("cpf", masked);
       clearError("cpf");
-      if (raw.length === 11) {
-        // optionally move to phone
-        focus("phone");
-      }
+   if (raw.length < 11) {
+  setErrors((p) => ({ ...p, cpf: "" })); // remove erro durante digitação
+}
     };
 
     // Phone formatting

@@ -9,10 +9,10 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Missing id" }, { status: 400 });
     }
 
-    const SECRET_KEY = process.env.NEXT_PUBLIC_PAYFORT_SECRET!;
-    const COMPANY_ID = process.env.NEXT_PUBLIC_PAYFORT_COMPANY_ID!;
+    const PUBLIC_KEY = process.env.PAYLOOP_PUBLIC_KEY!;
+    const SECRET_KEY = process.env.PAYLOOP_SECRET_KEY!;
 
-    const credentials = Buffer.from(`${SECRET_KEY}:${COMPANY_ID}`).toString("base64");
+    const credentials = Buffer.from(`${PUBLIC_KEY}:${SECRET_KEY}`).toString("base64");
 
     const res = await fetch(`https://api.pagloop.com/v1/transactions/${txId}`, {
       method: "GET",
@@ -25,11 +25,15 @@ export async function GET(req: Request) {
     const data = await res.json();
 
     return NextResponse.json({
+      id: data.id,
+      status: data.status,
       paid: data.status === "paid",
-      status: data.status
+      amount: data.amount,
+      paidAmount: data.paidAmount,
     });
 
   } catch (e) {
+    console.error("CHECK ERROR:", e);
     return NextResponse.json({ error: true }, { status: 500 });
   }
 }

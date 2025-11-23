@@ -1,94 +1,42 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { mailer } from "@/lib/mailer";
 
-export async function POST(req: Request) {
+
+export async function GET() {
   try {
-    const body = await req.json();
-    console.log("[WEBHOOK PIX RECEBIDO]", body);
+    // 🔥 DADOS FAKE PARA TESTE
+    const fakeData = {
+      customerName: "João Silva",
+      orderNumber: "PED-999888",
+      productName: "Ingresso Arquibancada F1",
+      totalAmount: "499,90",
+      linkPedidos: "https://eventim-f1.site/pedidos",
+    };
 
-    const externalRef = body?.data?.externalRef;
-    const status = body?.data?.status;
+    const html = htmlTemplate(fakeData);
 
-    if (!externalRef) {
-      return NextResponse.json(
-        { error: "Missing externalRef" },
-        { status: 400 }
-      );
-    }
+    const r = await mailer.sendMail({
+      from: `"Eventim F1" <${process.env.SMTP_FROM}>`,
+      to: "lospolloshermanos.black@gmail.com",
+      subject: "TESTE • Confirmação de Pagamento F1",
+      html,
+    });
 
-    // 1. Buscar pedido
-    const { data: order } = await supabaseAdmin
-      .from("orders")
-      .select("*, customers(*)")
-      .eq("external_ref", externalRef)
-      .single();
+    console.log("RESULTADO SMTP:", r);
 
-    if (!order) {
-      console.error("[WEBHOOK] Pedido não encontrado:", externalRef);
-      return NextResponse.json({ error: "Order not found" }, { status: 404 });
-    }
-
-    // 2. Evitar duplicação — mas NÃO bloquear e-mail
-    const jaPago = order.payment_status === "paid";
-
-    // 3. Só processa pagamento quando o status for paid mesmo
-    if (status === "paid") {
-      // Se ainda não estava pago, atualiza no banco
-      if (!jaPago) {
-        await supabaseAdmin
-          .from("orders")
-          .update({ payment_status: "paid" })
-          .eq("external_ref", externalRef);
-
-        console.log("[WEBHOOK] Pedido marcado como PAGO:", externalRef);
-      } else {
-        console.log("[WEBHOOK] Pedido já estava pago no banco.");
-      }
-
-      // 4. Enviar e-mail (sempre que chegar um paid, mesmo se duplicado)
-      if (order.customers?.email) {
-        try {
-          const r = await mailer.sendMail({
-            from: `"Eventim Ingressos" <${process.env.SMTP_FROM}>`,
-            to: order.customers.email,
-            subject: `Pagamento Confirmado — Pedido ${externalRef}`,
-            html: htmlTemplate({
-              customerName: order.customers.name,
-              orderNumber: externalRef,
-              productName: order.title,
-              totalAmount: (order.amount / 100).toFixed(2).replace(".", ","),
-              linkPedidos: `${process.env.NEXT_BASE_URL}/meus-pedidos`,
-            }),
-          });
-
-          console.log("[EMAIL CLIENTE ENVIADO]", r.response);
-        } catch (err) {
-          console.error("[ERRO AO ENVIAR EMAIL]", err);
-        }
-      }
-    }
-
-    return NextResponse.json({ ok: true });
-
+    return NextResponse.json({ ok: true, result: r });
   } catch (err) {
-    console.error("[WEBHOOK] Erro fatal:", err);
-    return NextResponse.json({ error: true }, { status: 500 });
+    console.error("SMTP ERROR:", err);
+    return NextResponse.json({ ok: false, error: String(err) });
   }
 }
 
 
-// 🔥 TEMPLATE ORIGINAL F1 — IDÊNTICO AO QUE VOCÊ ENVIOU
-const htmlTemplate = ({
-  customerName,
-  orderNumber,
-  productName,
-  totalAmount,
-  linkPedidos,
-}: any) => `
+const htmlTemplate = ({ customerName, orderNumber, productName, totalAmount, linkPedidos }: any) => `
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:30px 0;">
   <tbody><tr>
     <td align="center">
+
       <table width="600" cellpadding="0" cellspacing="0" style="background:#111;border-radius:10px 10px 0 0;">
         <tbody><tr>
           <td align="center" style="padding:25px 0;">
@@ -114,7 +62,7 @@ const htmlTemplate = ({
 
             <div style="margin-top:20px;background:#0f0f0f;border:1px solid #333;padding:16px;border-radius:8px;">
               <p style="font-family:Arial;font-size:15px;color:#bbb;margin:0;">
-                <strong>Pedido:</strong> ${orderNumber}<br>
+                 <strong>Pedido:</strong> ${orderNumber}<br>
                 <strong>Ingresso:</strong> ${productName}<br>
                 <strong>Valor Pago:</strong> R$ ${totalAmount}
               </p>

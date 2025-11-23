@@ -1,0 +1,151 @@
+/* --- CONTAINER GERAL ---------------------------------------------------- */
+.login-container {
+  width: 100%;
+  background: #f5f6fa;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* --- ÁREA CENTRAL -------------------------------------------------------- */
+.login-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 40px 16px;
+}
+
+
+/* --- CARD --------------------------------------------------------------- */
+.login-card {
+  width: 100%;
+  max-width: 460px;
+  background: #ffffff;
+  padding: 40px 32px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* --- TEXTOS ------------------------------------------------------------- */
+.login-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0b1e61;
+  margin-bottom: 6px;
+}
+
+.login-subtitle {
+  font-size: 15px;
+  color: #555;
+  margin-bottom: 26px;
+}
+
+
+/* --- FORM --------------------------------------------------------------- */
+.login-form label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0b1e61;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1.6px solid #c8cdd9;
+  outline: none;
+  transition: 0.25s;
+  background: #ffffff;
+}
+
+.login-form input:focus {
+  border-color: #0b1e61;
+  box-shadow: 0 0 0 3px rgba(11, 30, 97, 0.2);
+}
+
+/* --- BOTÃO -------------------------------------------------------------- */
+.login-button {
+  width: 100%;
+  margin-top: 30px;
+  padding: 14px;
+  font-size: 17px;
+  font-weight: 700;
+  background: #0b1e61;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.login-button:hover {
+  background: #152c90;
+}
+
+/* --- TEXTO INFORMATIVO -------------------------------------------------- */
+.login-info {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #444;
+  text-align: center;
+}
+
+
+/* --- MOBILE ------------------------------------------------------------- */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 32px 24px;
+  }
+
+  .login-title {
+    font-size: 24px;
+  }
+}
+
+.login-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  background: #3c4fa3;
+  color: #fff;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.login-button.loading {
+  pointer-events: none;
+  opacity: 0.85;
+  color: transparent;
+}
+
+/* Spinner circular premium */
+.login-spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid rgba(255,255,255,0.35); /* parte mais apagada */
+  border-top-color: #fff; /* parte forte */
+  border-radius: 50%;
+  animation: spin .75s linear infinite;
+  position: absolute;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0turn); }
+  100% { transform: rotate(1turn); }
+}
