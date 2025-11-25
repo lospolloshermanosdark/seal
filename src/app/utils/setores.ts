@@ -2,12 +2,12 @@
 export const setores: any = {
   "setor-a": {
     nome: "Setor A",
-    precoBase: 795,
+    precoBase: 459,
     tickets: [
-      { id: "A_INT", nome: "INTEIRA", preco: 795 },
-      { id: "A_MEIA", nome: "MEIA ENTRADA", preco: 795 / 2 },
-      { id: "A_IDOSO", nome: "MEIA IDOSO", preco: 795 / 2 },
-      { id: "A_PCD", nome: "MEIA PCD", preco: 795 / 2 },
+      { id: "A_INT", nome: "INTEIRA", preco: 459 },
+      { id: "A_MEIA", nome: "MEIA ENTRADA", preco: 459 / 2 },
+      { id: "A_IDOSO", nome: "MEIA IDOSO", preco: 459 / 2 },
+      { id: "A_PCD", nome: "MEIA PCD", preco: 459 / 2 },
     ],
   },
 
@@ -57,23 +57,23 @@ export const setores: any = {
 
   "setor-m": {
     nome: "Setor M",
-    precoBase: 1775,
+    precoBase: 499,
     tickets: [
-      { id: "M_INT", nome: "INTEIRA", preco: 1775 },
-      { id: "M_MEIA", nome: "MEIA ENTRADA", preco: 1775 / 2 },
-      { id: "M_IDOSO", nome: "MEIA IDOSO", preco: 1775 / 2 },
-      { id: "M_PCD", nome: "MEIA PCD", preco: 1775 / 2 },
+      { id: "M_INT", nome: "INTEIRA", preco: 499 },
+      { id: "M_MEIA", nome: "MEIA ENTRADA", preco: 499 / 2 },
+      { id: "M_IDOSO", nome: "MEIA IDOSO", preco: 499 / 2 },
+      { id: "M_PCD", nome: "MEIA PCD", preco: 499 / 2 },
     ],
   },
 
   "setor-r": {
     nome: "Setor R",
-    precoBase: 1075,
+    precoBase: 499,
     tickets: [
-      { id: "R_INT", nome: "INTEIRA", preco: 1075 },
-      { id: "R_MEIA", nome: "MEIA ENTRADA", preco: 1075 / 2 },
-      { id: "R_IDOSO", nome: "MEIA IDOSO", preco: 1075 / 2 },
-      { id: "R_PCD", nome: "MEIA PCD", preco: 1075 / 2 },
+      { id: "R_INT", nome: "INTEIRA", preco: 499 },
+      { id: "R_MEIA", nome: "MEIA ENTRADA", preco: 499 / 2 },
+      { id: "R_IDOSO", nome: "MEIA IDOSO", preco: 499 / 2 },
+      { id: "R_PCD", nome: "MEIA PCD", preco: 499 / 2 },
     ],
   },
 

@@ -1,3 +1,4 @@
+// src/app/api/postback/route.ts
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { mailer } from "@/lib/mailer";

@@ -1953,7 +1953,7 @@ export default function F1Main() {
                                         </ul>
                                         <p>
                                           A PARTIR DE
-                                          <strong>R$ 795,00</strong>
+                                          <strong>R$ 459,00</strong>
                                         </p>
                                         <p class="ilTixLinkShrtct">
                                           <a
@@ -2287,7 +2287,7 @@ export default function F1Main() {
                                         </ul>
                                         <p>
                                           A PARTIR DE
-                                          <strong>R$ 1.775,00</strong>
+                                          <strong>R$ 499,00</strong>
                                         </p>
                                         <p class="ilTixLinkShrtct">
                                           <a
@@ -2353,7 +2353,7 @@ export default function F1Main() {
                                         </ul>
                                         <p>
                                           A PARTIR DE
-                                          <strong>R$ 1.075,00</strong>
+                                          <strong>R$ 499,90</strong>
                                         </p>
                                         <p class="ilTixLinkShrtct">
                                           <a

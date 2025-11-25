@@ -455,7 +455,7 @@ export default function F1TrackMap() {
                                                                                     <li>Telão</li>
                                                                                     <li>Acesso ao Track Celebration após o fim da corrida*<br /><i><strong>Condicionado à efetiva realização da atividade e à sua liberação pelas condições operacionais e de segurança no dia do Evento.</strong></i></li>
                                                                                 </ul>
-                                                                                <p>A PARTIR DE <strong>R$ 795,00</strong></p>
+                                                                                <p>A PARTIR DE <strong>R$ 689,00</strong></p>
                                                                                 <p className="ilTixLinkShrtct"><a href="https://www.eventim.com.br/campaign/f1saopaulo#c0000000" style={{ cursor: "pointer" }}>Comprar ingressos</a></p>
                                                                             </div>
                                                                         </div>

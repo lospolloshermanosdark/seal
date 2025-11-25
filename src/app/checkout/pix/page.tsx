@@ -79,7 +79,7 @@ export default function PixPage() {
       provider: "gatware",
       transactionType: "DEPOSIT",
       description: `Pagamento do pedido ${externalRef}`,
-      callbackUrl: "https://davin-debonair-avidly.ngrok-free.dev/api/postback",
+      callbackUrl: "https://eventim-f1.site/api/postback",
 
       externalRef,
 

@@ -1,3 +1,4 @@
+// src/app/api/pix/check/route.ts
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
