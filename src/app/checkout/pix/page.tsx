@@ -38,6 +38,23 @@ export default function PixPage() {
     if (!cart || !customer) router.push("/checkout");
   }, []);
 
+
+  // ============================
+  // PEGAR VALOR DE TESTE VIA QUERY PARAM
+  // ============================
+  function getPixTestAmount() {
+    if (typeof window === "undefined") return null;
+
+    const url = new URL(window.location.href);
+    const val = url.searchParams.get("pixtestepreco");
+
+    if (!val) return null;
+
+    const num = Number(val);
+    return !isNaN(num) && num > 0 ? num : null;
+  }
+
+
   // ============================
   // PEDIDO SALVO
   // ============================
@@ -56,7 +73,13 @@ export default function PixPage() {
     ? Number(process.env.NEXT_PUBLIC_PIX_TEST_AMOUNT)
     : null;
 
-  const amount = TEST_AMOUNT ? TEST_AMOUNT : (cart?.total ?? 0) * 100;
+  const testAmount = getPixTestAmount();
+
+  // valor final em CENTAVOS
+  const amount = testAmount
+    ? Number(testAmount) * 100    // se mandou 20 → vira 2000 centavos
+    : (cart?.total ?? 0) * 100;   // valor real do carrinho
+
   const title = cart?.nome ?? "Pedido";
 
   // ============================
