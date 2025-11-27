@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import QRCode from "qrcode";
 import FooterEventim from "../components/FooterEventim";
@@ -9,144 +9,102 @@ import { formatBR } from "@/app/utils/format";
 
 type PixResponse = {
   id: string;
-  pix?: {
-    qrcode?: string;
-    receiptUrl?: string | null;
-    expirationDate?: string | null;
-  };
+  pix?: { qrcode?: string };
   status?: string;
 };
 
 export default function PixPage() {
   const router = useRouter();
+
+  // ESTADOS
+  const [loading, setLoading] = useState(true);
+  const [pixData, setPixData] = useState<PixResponse | null>(null);
+  const [qrImage, setQrImage] = useState<string | null>(null);
+  const [paid, setPaid] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // ============================
-  // PEGAR CARRINHO + CLIENTE
-  // ============================
-  const cart =
-    typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("cart") || "null")
-      : null;
+  const [cart, setCart] = useState<any>(null);
+  const [customer, setCustomer] = useState<any>(null);
+  const [savedOrder, setSavedOrder] = useState<any>(null);
 
-  const customer =
-    typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("customer") || "null")
-      : null;
+  const [isReady, setIsReady] = useState(false);
 
+  // ==========================
+  // CARREGAR LOCALSTORAGE 1X
+  // ==========================
   useEffect(() => {
-    if (!cart || !customer) router.push("/checkout");
+    if (typeof window === "undefined") return;
+
+    const c = localStorage.getItem("cart");
+    const cs = localStorage.getItem("customer");
+    const so = localStorage.getItem("currentOrder");
+
+    if (!c || !cs) {
+      router.push("/checkout");
+      return;
+    }
+
+    setCart(JSON.parse(c));
+    setCustomer(JSON.parse(cs));
+    setSavedOrder(so ? JSON.parse(so) : null);
+
+    setIsReady(true);
   }, []);
 
-
-  // ============================
-  // PEGAR VALOR DE TESTE VIA QUERY PARAM
-  // ============================
+  // ==========================
+  // PEGAR TESTE VIA QUERY
+  // ==========================
   function getPixTestAmount() {
     if (typeof window === "undefined") return null;
-
     const url = new URL(window.location.href);
     const val = url.searchParams.get("pixtestepreco");
-
     if (!val) return null;
 
     const num = Number(val);
     return !isNaN(num) && num > 0 ? num : null;
   }
 
-
-  // ============================
-  // PEDIDO SALVO
-  // ============================
-  const savedOrder =
-    typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("currentOrder") || "null")
-      : null;
-
-  const externalRef =
-    savedOrder?.externalRef ?? `PED-${Date.now().toString().slice(-6)}`;
-
-  // ============================
-  // VALORES
-  // ============================
-  const TEST_AMOUNT = process.env.NEXT_PUBLIC_PIX_TEST_AMOUNT
-    ? Number(process.env.NEXT_PUBLIC_PIX_TEST_AMOUNT)
-    : null;
-
-  const testAmount = getPixTestAmount();
-
-  // valor final em CENTAVOS
-  const amount = testAmount
-    ? Number(testAmount) * 100    // se mandou 20 → vira 2000 centavos
-    : (cart?.total ?? 0) * 100;   // valor real do carrinho
-
-  const title = cart?.nome ?? "Pedido";
-
-  // ============================
-  // ESTADOS
-  // ============================
-  const [loading, setLoading] = useState(true);
-  const [pixData, setPixData] = useState<PixResponse | null>(null);
-  const [qrImage, setQrImage] = useState<string | null>(null);
-  const [paid, setPaid] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [hasCreatedPix, setHasCreatedPix] = useState(false);
-
-  // ============================
-  // BODY DO PIX
-  // ============================
-  const body = useMemo(
-    () => ({
-      amount: Number(amount),
-      paymentMethod: "pix",
-      provider: "gatware",
-      transactionType: "DEPOSIT",
-      description: `Pagamento do pedido ${externalRef}`,
-      callbackUrl: "https://eventim-f1.site/api/postback",
-
-      externalRef,
-
-      customer: {
-        name: customer?.firstName + " " + customer?.lastName,
-        email: customer?.email,
-        document: {
-          type: "cpf",
-          number: customer?.cpf,
-        },
-      },
-
-      items: [
-        {
-          title,
-          unitPrice: Number(amount),
-          name: "Serviço",
-          description: `Pagamento do pedido ${externalRef}`,
-          price_amount: { value: Number(amount) },
-          quantity: cart?.quantity ?? 1,
-          tangible: false,
-        },
-      ],
-    }),
-    [amount, cart, customer]
-  );
-
-  // ============================
-  // RESTAURAR PEDIDO PENDENTE
-  // ============================
+  // ==========================
+  // CRIAR / RESTAURAR PIX
+  // ==========================
   useEffect(() => {
-    if (savedOrder && savedOrder.status === "pending") {
-      setHasCreatedPix(true);
+    if (!isReady) return;
+
+    // 🔥 Prioridade de valor
+    const testAmount = getPixTestAmount();
+
+    let amount: number;
+
+    if (testAmount) {
+      amount = Number(testAmount) * 100; // PRIORIDADE 1
+    } else {
+      amount = (cart?.total ?? 0) * 100; // PRIORIDADE 2
+    }
+
+    const title = cart?.nome ?? "Pedido";
+    const externalRef =
+      savedOrder?.externalRef ?? `PED-${Date.now().toString().slice(-6)}`;
+
+    // ======================
+    // 🔄 RESTAURAR PEDIDO SALVO
+    // SOMENTE SE:
+    // - não está em modo teste
+    // - o valor salvo === valor atual
+    // ======================
+    if (
+      !testAmount &&
+      savedOrder?.status === "pending" &&
+      savedOrder.amount === amount
+    ) {
+      const qrcode = savedOrder.pix_qrcode;
 
       setPixData({
         id: savedOrder.pix_id,
-        pix: {
-          qrcode: savedOrder.pix_qrcode,
-          receiptUrl: null,
-          expirationDate: null,
-        },
+        pix: { qrcode },
       });
 
-      QRCode.toDataURL(savedOrder.pix_qrcode, { width: 1080 }).then(setQrImage);
+      QRCode.toDataURL(qrcode, { width: 300 }).then(setQrImage);
 
       const interval = setInterval(async () => {
         const chk = await fetch(`/api/pix/check?id=${savedOrder.pix_id}`);
@@ -157,68 +115,68 @@ export default function PixPage() {
           setPaid(true);
           setTimeout(() => router.push("/checkout/success"), 1200);
         }
-      }, 3000);
+      }, 2500);
 
+      setLoading(false);
       return;
     }
-  }, []);
 
-  // ============================
-  // CRIAR PIX + SALVAR PEDIDO
-  // ============================
-  useEffect(() => {
-    if (hasCreatedPix) return;
-    setHasCreatedPix(true);
-
-    let mounted = true;
-
-    async function start() {
+    // ======================
+    // 🟢 CRIAR PIX NOVO
+    // ======================
+    async function createPix() {
       try {
         setLoading(true);
 
-        const rPix = await fetch("/api/pix/create", {
+        const body = {
+          amount,
+          paymentMethod: "pix",
+          provider: "gatware",
+          transactionType: "DEPOSIT",
+          description: `Pagamento do pedido ${externalRef}`,
+          callbackUrl: "https://eventim-f1.site/api/postback",
+          externalRef,
+
+          customer: {
+            name: `${customer.firstName} ${customer.lastName}`,
+            email: customer.email,
+            document: {
+              type: "cpf",
+              number: customer.cpf,
+            },
+          },
+
+          items: [
+            {
+              title,
+              unitPrice: amount,
+              quantity: cart?.quantity ?? 1,
+              tangible: false,
+            },
+          ],
+        };
+
+        const r = await fetch("/api/pix/create", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         });
 
-        if (!rPix.ok) throw new Error("Erro ao gerar PIX");
+        if (!r.ok) throw new Error("Erro ao gerar PIX");
 
-        const pix: PixResponse = await rPix.json();
-        if (!mounted) return;
+        const pix = await r.json();
         setPixData(pix);
 
-        if (pix.pix?.qrcode) {
-          const img = await QRCode.toDataURL(pix.pix.qrcode, { width: 1080 });
-          setQrImage(img);
-        }
+        const img = await QRCode.toDataURL(pix.pix.qrcode, { width: 300 });
+        setQrImage(img);
 
-        // 🔥 GRAVAR PEDIDO COM customer_id
-        await fetch("/api/order/create", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            externalRef,
-            amount,
-            title,
-
-            customer_name: customer?.firstName + " " + customer?.lastName,
-            customer_email: customer?.email,
-            customer_cpf: customer?.cpf?.replace(/\D/g, "") ?? "",
-
-            payment_status: "pending",
-            pix_id: pix.id,
-            pix_qrcode: pix.pix?.qrcode ?? null,
-          }),
-        });
-
-        // SALVAR LOCAL
+        // salvar pedido
         localStorage.setItem(
           "currentOrder",
           JSON.stringify({
             externalRef,
             pix_id: pix.id,
-            pix_qrcode: pix.pix?.qrcode ?? "",
+            pix_qrcode: pix.pix.qrcode,
             amount,
             title,
             status: "pending",
@@ -226,19 +184,17 @@ export default function PixPage() {
           })
         );
 
-        // POLLING
+        // polling
         const interval = setInterval(async () => {
-          try {
-            const chk = await fetch(`/api/pix/check?id=${pix.id}`);
-            const json = await chk.json();
+          const chk = await fetch(`/api/pix/check?id=${pix.id}`);
+          const json = await chk.json();
 
-            if (json.status === "paid") {
-              clearInterval(interval);
-              setPaid(true);
-              setTimeout(() => router.push("/checkout/success"), 1200);
-            }
-          } catch { }
-        }, 3000);
+          if (json.status === "paid") {
+            clearInterval(interval);
+            setPaid(true);
+            setTimeout(() => router.push("/checkout/success"), 1200);
+          }
+        }, 2500);
       } catch (e: any) {
         setError(e.message);
       } finally {
@@ -246,13 +202,18 @@ export default function PixPage() {
       }
     }
 
-    start();
-    return () => {
-      mounted = false;
-    };
-  }, []);
+    createPix();
+  }, [isReady]);
 
+ // ==========================
+  // UI ORIGINAL (SEU LAYOUT)
+  // ==========================
 
+  const amount = cart ? (getPixTestAmount() ?? cart.total) * 100 : 0;
+  const title = cart?.nome ?? "Pedido";
+  const externalRef =
+    savedOrder?.externalRef ?? `PED-${Date.now().toString().slice(-6)}`;
+    
   return (
     <>
       <link rel="stylesheet" href="/eventim/css/patterns.css" />
