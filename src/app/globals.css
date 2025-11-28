@@ -991,3 +991,190 @@ SEM ALTERAR NADA */
   font-size: 12px;
   margin-top: 4px;
 }
+
+
+/* ===========================
+   MOBILE FIRST
+   =========================== */
+
+.nf-container {
+  min-height: 100vh;
+  padding: 24px;
+  background: linear-gradient(to bottom, #f3f4f7, #ffffff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nf-wrapper {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* LEFT SECTION */
+.nf-left {
+  text-align: center;
+}
+
+.nf-icon-circle {
+  width: 96px;
+  height: 96px;
+  background: #eef2ff;
+  border: 1px solid #d0d7ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.nf-icon {
+  width: 48px;
+  height: 48px;
+  stroke: #3b5bdb;
+}
+
+.nf-title {
+  margin-top: 16px;
+  font-size: 28px;
+  font-weight: 800;
+  color: #111;
+}
+
+.nf-description {
+  margin-top: 8px;
+  font-size: 16px;
+  color: #555;
+}
+
+.nf-buttons {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.nf-btn {
+  padding: 14px 22px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  display: block;
+}
+
+.nf-btn-primary {
+  background: #0b74ff;
+  color: #fff;
+}
+
+.nf-btn-primary:hover {
+  background: #005ce6;
+}
+
+.nf-btn-secondary {
+  background: #fff;
+  border: 1px solid #ddd;
+  color: #444;
+}
+
+.nf-btn-secondary:hover {
+  background: #f4f4f4;
+}
+
+/* CARD (RIGHT SECTION) */
+.nf-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+}
+
+.nf-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nf-card-icon {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(to bottom right, #ffeef5, #fff7df);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nf-card-icon-svg {
+  width: 32px;
+  height: 32px;
+  stroke: #e64980;
+}
+
+.nf-card-subtitle {
+  font-size: 13px;
+  color: #777;
+}
+
+.nf-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #222;
+}
+
+.nf-card-list {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nf-card-link {
+  text-decoration: none;
+  font-size: 14px;
+  color: #0b74ff;
+}
+
+.nf-card-footer {
+  margin-top: 16px;
+  font-size: 12px;
+  color: #666;
+}
+
+.nf-card-footer-link {
+  color: #0b74ff;
+  text-decoration: underline;
+}
+
+/* ===========================
+   DESKTOP RESPONSIVE
+   =========================== */
+
+@media (min-width: 768px) {
+  .nf-wrapper {
+    max-width: 860px;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .nf-left {
+    flex: 1;
+    text-align: left;
+  }
+
+  .nf-icon-circle {
+    margin-left: 0;
+  }
+
+  .nf-card {
+    width: 360px;
+  }
+}

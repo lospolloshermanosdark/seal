@@ -75,11 +75,10 @@ export default function PixPage() {
     const testAmount = getPixTestAmount();
 
     let amount: number;
-
     if (testAmount) {
-      amount = Number(testAmount) * 100; // PRIORIDADE 1
+      amount = Number(testAmount) * 100;
     } else {
-      amount = (cart?.total ?? 0) * 100; // PRIORIDADE 2
+      amount = (cart?.total ?? 0) * 100;
     }
 
     const title = cart?.nome ?? "Pedido";
@@ -87,10 +86,7 @@ export default function PixPage() {
       savedOrder?.externalRef ?? `PED-${Date.now().toString().slice(-6)}`;
 
     // ======================
-    // 🔄 RESTAURAR PEDIDO SALVO
-    // SOMENTE SE:
-    // - não está em modo teste
-    // - o valor salvo === valor atual
+    // 🔄 RESTAURAR PEDIDO
     // ======================
     if (
       !testAmount &&
@@ -117,9 +113,15 @@ export default function PixPage() {
         }
       }, 2500);
 
+      // cleanup
+      const cleanup = () => clearInterval(interval);
+
       setLoading(false);
-      return;
+
+      return cleanup;
     }
+
+
 
     // ======================
     // 🟢 CRIAR PIX NOVO
@@ -140,9 +142,10 @@ export default function PixPage() {
           customer: {
             name: `${customer.firstName} ${customer.lastName}`,
             email: customer.email,
+            phone: (customer.phone ?? customer.celular ?? "").replace(/\D/g, ""),
             document: {
               type: "cpf",
-              number: customer.cpf,
+              number: customer.cpf.replace(/\D/g, ""),
             },
           },
 
@@ -167,10 +170,29 @@ export default function PixPage() {
         const pix = await r.json();
         setPixData(pix);
 
-        const img = await QRCode.toDataURL(pix.pix.qrcode, { width: 300 });
-        setQrImage(img);
+        // ⚡ não trava a tela
+        QRCode.toDataURL(pix.pix.qrcode, { width: 300 }).then(setQrImage);
 
-        // salvar pedido
+        // ⚡ liberar tela
+        setLoading(false);
+
+        // ⚡ salvar sem travar
+        fetch("/api/order/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            externalRef,
+            amount,
+            title,
+            pix_qrcode: pix.pix.qrcode,
+            customer_name: `${customer.firstName} ${customer.lastName}`,
+            customer_email: customer.email,
+            customer_phone: (customer.phone ?? customer.celular ?? "").replace(/\D/g, ""),
+            customer_cpf: customer.cpf.replace(/\D/g, ""),
+          }),
+        }).catch(() => { });
+
+        // salvar pedido local
         localStorage.setItem(
           "currentOrder",
           JSON.stringify({
@@ -197,7 +219,6 @@ export default function PixPage() {
         }, 2500);
       } catch (e: any) {
         setError(e.message);
-      } finally {
         setLoading(false);
       }
     }
@@ -205,7 +226,7 @@ export default function PixPage() {
     createPix();
   }, [isReady]);
 
- // ==========================
+  // ==========================
   // UI ORIGINAL (SEU LAYOUT)
   // ==========================
 
@@ -213,7 +234,7 @@ export default function PixPage() {
   const title = cart?.nome ?? "Pedido";
   const externalRef =
     savedOrder?.externalRef ?? `PED-${Date.now().toString().slice(-6)}`;
-    
+
   return (
     <>
       <link rel="stylesheet" href="/eventim/css/patterns.css" />
@@ -349,17 +370,15 @@ export default function PixPage() {
                   {loading ? (
                     <div className="spinner-wrapper">
                       <div className="spinner-circle-checkout"></div>
-                      <div className="spinner-message-message">
+                      <div className="spinner-message-checkout">
                         Gerando PIX…
                       </div>
                     </div>
                   ) : (
                     <>
-                      <img
-                        src={qrImage ?? ""}
-                        className="qr-img"
-                        alt="QR Code"
-                      />
+                      {qrImage && (
+                        <img src={qrImage} className="qr-img" alt="QR Code" />
+                      )}
 
                       <textarea
                         readOnly
