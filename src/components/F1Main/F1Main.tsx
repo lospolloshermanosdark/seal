@@ -1872,7 +1872,7 @@ export default function F1Main() {
                                         </p>
                                         <p>
                                           A PARTIR DE
-                                          <strong>R$ 2.900,00</strong>
+                                          <strong>R$ 2.500,00</strong>
                                         </p>
                                         <p class="ilTixLinkShrtct">
                                           <a
