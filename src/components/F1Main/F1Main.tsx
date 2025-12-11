@@ -5,13 +5,12 @@ import Script from "next/script";
 
 export default function F1Main() {
   const html = `
-     <main id="main">
+  <main id="main">
   <div class="main-container">
     <div class="content-wrap">
       <div class="container cecontainer">
-        <a id="c1038672"></a
-        >
-        
+        <a id="c1038672"></a>
+
         <style>
           @font-face {
             font-family: "TitilliumWeb";
@@ -163,8 +162,6 @@ export default function F1Main() {
             }
           }
         </style>
-
-        
       </div>
       <div class="gridelement uid1038669 left-0 right-0 top-0 bot-0" style="">
         <div class="container cecontainer">
@@ -1763,12 +1760,12 @@ export default function F1Main() {
                       <div class="row">
                         <div class="col col-xs-24">
                           <div
-                            class="gridelement uid1038504 ilTrkmpInfoBox ilSctrHvg"
+                            class="gridelement uid1038576 ilTrkmpInfoBox ilSctrHvg"
                             style=""
                           >
                             <div class="row">
                               <div class="col col-xs-24">
-                                <div id="c1038501">
+                                <div id="c10385733">
                                   <div class="ce-text ce-center ce-above">
                                     <div class="ce-bodytext">
                                       <h3>Heineken Village - Gramado</h3>
@@ -1778,11 +1775,11 @@ export default function F1Main() {
                                 </div>
                                 <div
                                   class="collapse"
-                                  id="collapse1038504"
+                                  id="collapse103857666"
                                   aria-expanded="false"
                                   style="height: 0px"
                                 >
-                                  <div id="c1038498">
+                                  <div id="c1038570">
                                     <div class="ce-text ce-center ce-above">
                                       <div class="ce-bodytext">
                                         <ul>
@@ -1817,12 +1814,12 @@ export default function F1Main() {
                                   </div>
                                 </div>
                                 <a
-                                  class="viewMore collapsed"
-                                  data-toggle="collapse"
-                                  href="#collapse1038504"
+                                  class="viewMore"
+                                  data-bs-toggle="collapse"
+                                  href="#collapse103857666"
                                   aria-expanded="false"
-                                  aria-controls="collapse1038504"
-                                  sector-id="ilSctrHvg"
+                                  aria-controls="collapse103857666"
+                                  sector-id="ilSctrA"
                                   ><i
                                     class="fa fa-caret-right"
                                     aria-hidden="true"
@@ -1833,12 +1830,12 @@ export default function F1Main() {
                             </div>
                           </div>
                           <div
-                            class="gridelement uid1038495 ilTrkmpInfoBox ilSctrHve"
+                            class="gridelement uid1038576 ilTrkmpInfoBox ilSctrHve"
                             style=""
                           >
                             <div class="row">
                               <div class="col col-xs-24">
-                                <div id="c1038492">
+                                <div id="c103857333">
                                   <div class="ce-text ce-center ce-above">
                                     <div class="ce-bodytext">
                                       <h3>Heineken Village - Estrela</h3>
@@ -1848,11 +1845,11 @@ export default function F1Main() {
                                 </div>
                                 <div
                                   class="collapse"
-                                  id="collapse1038495"
+                                  id="collapse1038576667"
                                   aria-expanded="false"
                                   style="height: 0px"
                                 >
-                                  <div id="c1038489">
+                                  <div id="c1038570">
                                     <div class="ce-text ce-center ce-above">
                                       <div class="ce-bodytext">
                                         <ul>
@@ -1875,7 +1872,7 @@ export default function F1Main() {
                                         </p>
                                         <p>
                                           A PARTIR DE
-                                          <strong>R$ 4.960,00</strong>
+                                          <strong>R$ 2.900,00</strong>
                                         </p>
                                         <p class="ilTixLinkShrtct">
                                           <a
@@ -1890,12 +1887,12 @@ export default function F1Main() {
                                   </div>
                                 </div>
                                 <a
-                                  class="viewMore collapsed"
-                                  data-toggle="collapse"
-                                  href="#collapse1038495"
+                                  class="viewMore"
+                                  data-bs-toggle="collapse"
+                                  href="#collapse1038576667"
                                   aria-expanded="false"
-                                  aria-controls="collapse1038495"
-                                  sector-id="ilSctrHve"
+                                  aria-controls="collapse1038576667"
+                                  sector-id="ilSctrA"
                                   ><i
                                     class="fa fa-caret-right"
                                     aria-hidden="true"
@@ -1905,7 +1902,6 @@ export default function F1Main() {
                               </div>
                             </div>
                           </div>
-
                           <div
                             class="gridelement uid1038576 ilTrkmpInfoBox ilSctrA"
                             style=""
@@ -1915,7 +1911,6 @@ export default function F1Main() {
                                 <div id="c1038573">
                                   <div class="ce-text ce-center ce-above">
                                     <div class="ce-bodytext">
-                                  
                                       <h3>Setor A</h3>
                                     </div>
                                   </div>
@@ -2798,15 +2793,15 @@ export default function F1Main() {
                           <ul>
                             <li>
                               <a
-                                href="/event?id=heineken-village-gramado tixLinkSoon"
-                                class="internalLink tixLinkHeineken tixLinkSoon"
+                                href="/event?id=heineken-village-gramado"
+                                class="internalLink tixLinkHeineken"
                                 >HEINEKEN VILLAGE - GRAMADO</a
                               >
                             </li>
                             <li>
                               <a
-                                href="/event?id=heineken-village-estrela tixLinkSoon"
-                                class="internalLink tixLinkHeineken tixLinkSoon"
+                                href="/event?id=heineken-village-estrela"
+                                class="internalLink tixLinkHeineken"
                                 >HEINEKEN VILLAGE - ESTRELA</a
                               >
                             </li>
@@ -6797,6 +6792,8 @@ export default function F1Main() {
     </div>
   </div>
 </main>
+
+
 
   `;
 

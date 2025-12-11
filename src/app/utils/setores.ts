@@ -109,4 +109,110 @@ export const setores: any = {
       { id: "GPC_PCD", nome: "MEIA PCD", preco: 20900 / 2 },
     ],
   },
+
+  "heineken-village-estrela": {
+    nome: "HEINEKEN VILLAGE - ESTRELA",
+    procoBase: 2500,
+    tickets: [
+      {
+        id: "HNK_INT",
+        nome: "PREÇO ÚNICO",
+        preco: 2500,
+      },
+      {
+        id: "HNK_CADEIRANTE",
+        nome: "CADEIRANTE",
+        preco: 2500,
+      },
+      {
+        id: "HNK_CADEIRANTE_ACOMPA",
+        nome: "CADEIRANTE+ACOMPA",
+        preco: 2500,
+      },
+      {
+        id: "HNK_OBESO",
+        nome: "OBESO",
+        preco: 2500,
+      },
+      {
+        id: "HNK_OBESO_ACOMPA",
+        nome: "OBESO+ACOMPA",
+        preco: 2500,
+      },
+      {
+        id: "HNK_PCD",
+        nome: "PCD",
+        preco: 2500,
+      },
+      {
+        id: "HNK_PCD_ACOMPA",
+        nome: "PCD+ACOMPANHANTE",
+        preco: 2500,
+      },
+    ],
+  },
+
+  "heineken-village-gramado": {
+    nome: "HEINEKEN VILLAGE - GRAMADO",
+    procoBase: 2100,
+    tickets: [
+      {
+        id: "HNK_INT",
+        nome: "PREÇO ÚNICO",
+        preco: 2100,
+      },
+      {
+        id: "MEIA ESTUDANTE",
+        nome: "MEIA ESTUDANTE",
+        preco: 1240,
+      },
+      {
+        id: "MEIAAPOSENTADO",
+        nome: "MEIA APOSENTADO",
+        preco: 1240,
+      },
+      {
+        id: "MEIA_escola_SP",
+        nome: "MEIA FUNC. ESCOLA SP",
+        preco: 1240,
+      },
+
+      {
+        id: "MEIA IDOSO",
+        nome: "MEIA IDOSO",
+        preco: 1240,
+      },
+      {
+        id: "HNK_CADEIRANTE",
+        nome: "CADEIRANTE",
+        preco: 1240,
+      },
+      {
+        id: "HNK_CADEIRANTE_ACOMPA",
+        nome: "CADEIRANTE+ACOMPA",
+        preco: 1240,
+      },
+      {
+        id: "HNK_OBESO",
+        nome: "OBESO",
+        preco: 1240,
+      },
+      {
+        id: "HNK_OBESO_ACOMPA",
+        nome: "OBESO+ACOMPA",
+        preco: 1240,
+      },
+      {
+        id: "HNK_PCD",
+        nome: "PCD",
+        preco: 1240,
+      },
+      {
+        id: "HNK_PCD_ACOMPA",
+        nome: "PCD+ACOMPANHANTE",
+        preco: 1240,
+      },
+    ],
+  },
+  //
 };

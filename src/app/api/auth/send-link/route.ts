@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { mailer } from "@/lib/mailer";
 import crypto from "crypto";
 
 export async function POST(req: Request) {
@@ -38,18 +37,7 @@ export async function POST(req: Request) {
 
     const link = `${process.env.NEXT_BASE_URL}/auth/access?token=${token}`;
 
-    // 3 — Enviar e-mail com link mágico
-    await mailer.sendMail({
-      from: `"Eventim Ingressos" <${process.env.SMTP_FROM}>`,
-      to: email,
-      subject: "Seu acesso seguro — Eventim Ingressos",
-      html: `
-        <h2>Seu acesso está pronto</h2>
-        <p>Clique no botão abaixo para entrar com segurança:</p>
-        <p><a href="${link}" style="padding:12px 22px;background:#0b1e61;color:#fff;border-radius:8px;text-decoration:none;">Entrar agora</a></p>
-        <p>Este link expira em 15 minutos.</p>
-      `,
-    });
+ 
 
     return NextResponse.json({ ok: true });
   } catch (err) {
