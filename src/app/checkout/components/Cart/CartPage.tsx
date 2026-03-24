@@ -78,7 +78,7 @@ export default function CartPage() {
                     venue="Autódromo de São Paulo — F1 2026"
                     date="31 de Outubro a 02 de Novembro"
                     promoter="Fórmula 1 Brasil"
-                    image="/eventim/imgs/F12026-eventim-artwork.png"
+                    image="/eventim/imgs/Dominguinho_Eventim_1240x480.png"
                   />
                 )}
 

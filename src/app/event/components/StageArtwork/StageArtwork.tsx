@@ -11,7 +11,7 @@ export default function StageArtwork() {
           {/* Fundo borrado desktop */}
           <div className="main-stage-bg hidden-xs">
             <Image
-              src="/eventim/assets/F12026-eventim-artwork.png"
+              src="/eventim/assets/Dominguinho_Eventim_1240x480.png"
               alt=""
               className="stage-blurred-image"
               width={1920}
