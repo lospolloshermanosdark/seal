@@ -1,5 +1,11 @@
 // src/app/utils/setores.ts
 
+const MAX_PRICE = 990;
+
+function capPrice(price: number) {
+  return Math.min(price, MAX_PRICE);
+}
+
 export const eventosSeal = {
   "rio-de-janeiro": {
     nome: "Rio de Janeiro",
@@ -11,18 +17,18 @@ export const eventosSeal = {
         id: "pista",
         nome: "Pista",
         prices: {
-          meia: 297.5,
-          itau: 505.75,
-          inteira: 595,
+          meia: capPrice(297.5),
+          itau: capPrice(505.75),
+          inteira: capPrice(595),
         },
       },
       {
         id: "poltronas",
         nome: "Poltronas",
         prices: {
-          meia: 197.5,
-          itau: 335.75,
-          inteira: 395,
+          meia: capPrice(197.5),
+          itau: capPrice(335.75),
+          inteira: capPrice(395),
         },
       },
       {
@@ -30,18 +36,18 @@ export const eventosSeal = {
         nome: "Pista Premium",
         highlight: true,
         prices: {
-          meia: 497.5,
-          itau: 845.75,
-          inteira: 995,
+          meia: capPrice(497.5),
+          itau: capPrice(845.75),
+          inteira: capPrice(995), // 🔥 vira 990
         },
       },
       {
         id: "camarote-a",
         nome: "Camarote A",
         prices: {
-          meia: 647.5,
-          itau: 1100.75,
-          inteira: 1295,
+          meia: capPrice(647.5),
+          itau: capPrice(1100.75), // 🔥 vira 990
+          inteira: capPrice(1295), // 🔥 vira 990
         },
       },
     ],
@@ -57,18 +63,18 @@ export const eventosSeal = {
         id: "cadeira-superior",
         nome: "Cadeira Superior",
         prices: {
-          meia: 172.5,
-          itau: 293.25,
-          inteira: 345,
+          meia: capPrice(172.5),
+          itau: capPrice(293.25),
+          inteira: capPrice(345),
         },
       },
       {
         id: "cadeira-gold",
         nome: "Cadeira Gold",
         prices: {
-          meia: 347.5,
-          itau: 590.75,
-          inteira: 695,
+          meia: capPrice(347.5),
+          itau: capPrice(590.75),
+          inteira: capPrice(695),
         },
       },
       {
@@ -76,9 +82,9 @@ export const eventosSeal = {
         nome: "Cadeira Diamond",
         highlight: true,
         prices: {
-          meia: 547.5,
-          itau: 930.75,
-          inteira: 1095,
+          meia: capPrice(547.5),
+          itau: capPrice(930.75),
+          inteira: capPrice(1095), // 🔥 vira 990
         },
       },
       {
@@ -86,9 +92,9 @@ export const eventosSeal = {
         nome: "Cadeira VIP",
         highlight: true,
         prices: {
-          meia: 897.5,
-          itau: 1525.75,
-          inteira: 1795,
+          meia: capPrice(897.5),
+          itau: capPrice(1525.75), // 🔥 vira 990
+          inteira: capPrice(1795), // 🔥 vira 990
         },
       },
     ],

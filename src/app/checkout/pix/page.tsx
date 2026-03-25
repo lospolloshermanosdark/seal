@@ -60,7 +60,7 @@ export default function PixPage() {
         setLoading(true);
 
         const externalRef = externalRefRef.current;
-        const amount = Math.round(10 * 100);
+        const amount = Math.round(cart.total * 100);
 
         // 🔁 RESTORE
         const saved = localStorage.getItem("currentPixOrder");
