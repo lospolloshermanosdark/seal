@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import QRCode from "qrcode";
 import FooterEventim from "../components/FooterEventim";
@@ -10,13 +10,11 @@ import { formatBR } from "@/app/utils/format";
 type PixResponse = {
   id: string;
   pix?: { qrcode?: string };
-  status?: string;
 };
 
 export default function PixPage() {
   const router = useRouter();
 
-  // ESTADOS
   const [loading, setLoading] = useState(true);
   const [pixData, setPixData] = useState<PixResponse | null>(null);
   const [qrImage, setQrImage] = useState<string | null>(null);
@@ -26,19 +24,18 @@ export default function PixPage() {
 
   const [cart, setCart] = useState<any>(null);
   const [customer, setCustomer] = useState<any>(null);
-  const [savedOrder, setSavedOrder] = useState<any>(null);
 
-  const [isReady, setIsReady] = useState(false);
+  const pollRef = useRef<NodeJS.Timeout | null>(null);
+  const initializedRef = useRef(false);
+
+  const externalRefRef = useRef(`PED-${Date.now().toString().slice(-6)}`);
 
   // ==========================
-  // CARREGAR LOCALSTORAGE 1X
+  // LOAD LOCAL STORAGE
   // ==========================
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
     const c = localStorage.getItem("cart");
     const cs = localStorage.getItem("customer");
-    const so = localStorage.getItem("currentOrder");
 
     if (!c || !cs) {
       router.push("/checkout");
@@ -47,325 +44,180 @@ export default function PixPage() {
 
     setCart(JSON.parse(c));
     setCustomer(JSON.parse(cs));
-    setSavedOrder(so ? JSON.parse(so) : null);
-
-    setIsReady(true);
   }, []);
 
   // ==========================
-  // PEGAR TESTE VIA QUERY
-  // ==========================
-  function getPixTestAmount() {
-    if (typeof window === "undefined") return null;
-    const url = new URL(window.location.href);
-    const val = url.searchParams.get("pixtestepreco");
-    if (!val) return null;
-
-    const num = Number(val);
-    return !isNaN(num) && num > 0 ? num : null;
-  }
-
-  // ==========================
-  // CRIAR / RESTAURAR PIX
+  // CREATE / RESTORE PIX
   // ==========================
   useEffect(() => {
-    if (!isReady) return;
+    if (!cart || !customer) return;
+    if (initializedRef.current) return;
 
-    // 🔥 Prioridade de valor
-    const testAmount = getPixTestAmount();
+    initializedRef.current = true;
 
-    let amount: number;
-    if (testAmount) {
-      amount = Number(testAmount) * 100;
-    } else {
-      amount = (cart?.total ?? 0) * 100;
-    }
-
-    const title = cart?.nome ?? "Pedido";
-    const externalRef =
-      savedOrder?.externalRef ?? `PED-${Date.now().toString().slice(-6)}`;
-
-    // ======================
-    // 🔄 RESTAURAR PEDIDO
-    // ======================
-    if (
-      !testAmount &&
-      savedOrder?.status === "pending" &&
-      savedOrder.amount === amount
-    ) {
-      const qrcode = savedOrder.pix_qrcode;
-
-      setPixData({
-        id: savedOrder.pix_id,
-        pix: { qrcode },
-      });
-
-      QRCode.toDataURL(qrcode, { width: 300 }).then(setQrImage);
-
-      const interval = setInterval(async () => {
-        const chk = await fetch(`/api/pix/check?id=${savedOrder.pix_id}`);
-        const json = await chk.json();
-
-        if (json.status === "paid") {
-          clearInterval(interval);
-          setPaid(true);
-          setTimeout(() => router.push("/checkout/success"), 1200);
-        }
-      }, 2500);
-
-      // cleanup
-      const cleanup = () => clearInterval(interval);
-
-      setLoading(false);
-
-      return cleanup;
-    }
-
-
-
-    // ======================
-    // 🟢 CRIAR PIX NOVO
-    // ======================
-    async function createPix() {
+    async function gerarPix() {
       try {
         setLoading(true);
 
-        const body = {
+        const externalRef = externalRefRef.current;
+        const amount = Math.round(10 * 100);
+
+        // 🔁 RESTORE
+        const saved = localStorage.getItem("currentPixOrder");
+
+        if (saved) {
+          const order = JSON.parse(saved);
+
+          if (
+            order.externalRef === externalRef &&
+            order.qrCode &&
+            order.pix_id
+          ) {
+            setPixData({
+              id: order.pix_id,
+              pix: { qrcode: order.qrCode },
+            });
+
+            const qr = await QRCode.toDataURL(order.qrCode, { width: 300 });
+            setQrImage(qr);
+
+            setLoading(false);
+            startPolling(order.pix_id);
+            return;
+          }
+        }
+
+        // 🟢 CREATE PIX
+        const payload = {
+          gateway: "ironpay",
           amount,
-          paymentMethod: "pix",
-          provider: "gatware",
-          transactionType: "DEPOSIT",
-          description: `Pagamento do pedido ${externalRef}`,
-          callbackUrl: "https://eventim-f1.site/api/postback",
           externalRef,
 
-          customer: {
-            name: `${customer.firstName} ${customer.lastName}`,
-            email: customer.email,
-            phone: (customer.phone ?? customer.celular ?? "").replace(/\D/g, ""),
-            document: {
-              type: "cpf",
-              number: customer.cpf.replace(/\D/g, ""),
-            },
-          },
-
-          items: [
+          cart: [
             {
-              title,
+              nome: cart.nome,
+              produto: cart.setor,
+              quantity: cart.quantity,
               unitPrice: amount,
-              quantity: cart?.quantity ?? 1,
-              tangible: false,
             },
           ],
+
+          customer: {
+            firstName: customer.firstName,
+            lastName: customer.lastName,
+            email: customer.email,
+            phone: customer.phone.replace(/\D/g, ""),
+            cpf: customer.cpf.replace(/\D/g, ""),
+          },
         };
 
-        const r = await fetch("/api/pix/create", {
+        const res = await fetch("/api/pix/create", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
+          body: JSON.stringify(payload),
         });
 
-        if (!r.ok) throw new Error("Erro ao gerar PIX");
+        if (!res.ok) throw new Error("Erro ao gerar PIX");
 
-        const pix = await r.json();
-        setPixData(pix);
+        const data = await res.json();
 
-        // ⚡ não trava a tela
-        QRCode.toDataURL(pix.pix.qrcode, { width: 300 }).then(setQrImage);
+        const qrCode = data.pix?.qrcode ?? data.qrCode;
 
-        // ⚡ liberar tela
-        setLoading(false);
+        if (!qrCode) throw new Error("QR Code não retornado");
 
-        // ⚡ salvar sem travar
-        fetch("/api/order/create", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            externalRef,
-            amount,
-            title,
-            pix_qrcode: pix.pix.qrcode,
-            customer_name: `${customer.firstName} ${customer.lastName}`,
-            customer_email: customer.email,
-            customer_phone: (customer.phone ?? customer.celular ?? "").replace(/\D/g, ""),
-            customer_cpf: customer.cpf.replace(/\D/g, ""),
-          }),
-        }).catch(() => { });
+        setPixData({
+          id: data.id,
+          pix: { qrcode: qrCode },
+        });
 
-        // salvar pedido local
+        const qr = await QRCode.toDataURL(qrCode, { width: 300 });
+        setQrImage(qr);
+
         localStorage.setItem(
-          "currentOrder",
+          "currentPixOrder",
           JSON.stringify({
             externalRef,
-            pix_id: pix.id,
-            pix_qrcode: pix.pix.qrcode,
-            amount,
-            title,
-            status: "pending",
-            created_at: Date.now(),
+            pix_id: data.id,
+            qrCode,
           })
         );
 
-        // polling
-        const interval = setInterval(async () => {
-          const chk = await fetch(`/api/pix/check?id=${pix.id}`);
-          const json = await chk.json();
-
-          if (json.status === "paid") {
-            clearInterval(interval);
-            setPaid(true);
-            setTimeout(() => router.push("/checkout/success"), 1200);
-          }
-        }, 2500);
-      } catch (e: any) {
-        setError(e.message);
+        setLoading(false);
+        startPolling(data.id);
+      } catch (err: any) {
+        setError(err.message);
         setLoading(false);
       }
     }
 
-    createPix();
-  }, [isReady]);
+    gerarPix();
+  }, [cart, customer]);
 
   // ==========================
-  // UI ORIGINAL (SEU LAYOUT)
+  // POLLING
   // ==========================
+const startPolling = (pixId: string) => {
+  if (pollRef.current) clearInterval(pollRef.current);
 
-  const amount = cart ? (getPixTestAmount() ?? cart.total) * 100 : 0;
+  pollRef.current = setInterval(async () => {
+    try {
+      const res = await fetch(
+        `/api/pix/check?id=${pixId}&gateway=ironpay`
+      );
+
+      const json = await res.json();
+
+      console.log("PIX STATUS:", json);
+
+      if (
+        json?.paid === true ||
+        json?.status === "paid" ||
+        json?.status === "COMPLETED"
+      ) {
+        clearInterval(pollRef.current!);
+
+        localStorage.removeItem("currentPixOrder");
+
+        setPaid(true);
+
+        setTimeout(() => {
+          router.push("/checkout/success");
+        }, 1200);
+      }
+    } catch {}
+  }, 3000);
+};
+
+  const amount = cart ? cart.total * 100 : 0;
   const title = cart?.nome ?? "Pedido";
-  const externalRef =
-    savedOrder?.externalRef ?? `PED-${Date.now().toString().slice(-6)}`;
 
   return (
     <>
       <link rel="stylesheet" href="/eventim/css/patterns.css" />
       <link rel="stylesheet" href="/eventim/css/checkout.css" />
 
-      <style>{`
-        .pix-wrapper {
-          display: grid;
-          gap: 32px;
-          margin-top: 20px;
-          justify-content: center;
-        }
-/* SPINNER EVENTIM */
-.spinner-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 30px 0;
-  gap: 12px;
-}
-
-.spinner-circle-checkout {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #d8d8d8;
-  border-top-color: #0B74FF;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-.spinner-message-checkout {
-  font-size: 15px;
-  color: #333;
-}
-
-        @media (min-width: 992px) {
-          .pix-wrapper {
-            grid-template-columns: 460px 360px;
-          }
-        }
-
-        .pix-card {
-          background: #fff;
-          border-radius: 16px;
-          padding: 24px;
-          box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-        }
-
-        .order-tag {
-          background: #eef2ff;
-          color: #3b5bdb;
-          padding: 6px 12px;
-          border-radius: 8px;
-          font-weight: 600;
-          display: inline-block;
-          margin-top: 6px;
-          box-shadow: inset 0 0 0 1px #d0d7ff;
-        }
-
-        .summary-line {
-          padding-bottom: 12px;
-          border-bottom: 1px solid #eee;
-          margin-top: 12px;
-        }
-
-        .btn-primary {
-          border-radius: 8px;
-          font-size: 16px;
-        }
-
-        .qr-img {
-          width: 100%;
-          max-width: 320px;
-          margin: 0 auto;
-          display: block;
-        }
-
-.card-content {
-  display: flex!important;
-  flex-direction: column!important;
-  justify-content: center!important;
-}
-
-.selection-list-headline{
-  text-align: center;
-}
-
-.order-tag {
-    text-align: center;
-
-}
-        @media(max-width: 480px){
-          .qr-img{
-            max-width: 260px;
-          }
-        }
-      `}</style>
-
-      <div
-        className="checkout-wrapper-container"
-        style={{ background: "#f3f4f7" }}
-      >
+      <div className="checkout-wrapper-container" style={{ background: "#f3f4f7" }}>
         <div className="wrapper wrapper-container">
           <HeaderCheckout />
 
-          <div
-            className="row card standard-gray-shadow theme-content-bg"
-            style={{ marginTop: 40, padding: 24, borderRadius: 16 }}
-          >
+          <div className="row card standard-gray-shadow theme-content-bg" style={{ marginTop: 40, padding: 24, borderRadius: 16 }}>
             <div className="card-content">
+
               <h2 className="selection-list-headline u-font-weight-bold">
                 Pague com PIX
               </h2>
 
               <div className="order-tag">
-                Pedido: <strong>{externalRef}</strong>
+                Pedido: <strong>{externalRefRef.current}</strong>
               </div>
 
               <p style={{ marginTop: 10, textAlign: "center" }}>
                 {title} — <strong>R$ {formatBR(amount)}</strong>
               </p>
 
-              {/* GRID */}
               <div className="pix-wrapper">
-                {/* Caixa PIX */}
+
+                {/* PIX */}
                 <div className="pix-card">
                   {loading ? (
                     <div className="spinner-wrapper">
@@ -376,9 +228,7 @@ export default function PixPage() {
                     </div>
                   ) : (
                     <>
-                      {qrImage && (
-                        <img src={qrImage} className="qr-img" alt="QR Code" />
-                      )}
+                      {qrImage && <img src={qrImage} className="qr-img" style={{margin: "0 auto"}} />}
 
                       <textarea
                         readOnly
@@ -397,26 +247,22 @@ export default function PixPage() {
                         className="btn btn-primary btn-lg btn-block"
                         style={{ marginTop: 12 }}
                         onClick={() => {
-                          navigator.clipboard.writeText(
-                            pixData?.pix?.qrcode ?? ""
-                          );
+                          navigator.clipboard.writeText(pixData?.pix?.qrcode ?? "");
                           setCopied(true);
-                          setTimeout(() => setCopied(false), 2500);
+                          setTimeout(() => setCopied(false), 2000);
                         }}
                       >
-                        Copiar PIX
+                        {copied ? "Copiado!" : "Copiar PIX"}
                       </button>
 
                       <p style={{ marginTop: 10, textAlign: "center" }}>
-                        {paid
-                          ? "Pagamento confirmado!"
-                          : "Aguardando pagamento…"}
+                        {paid ? "Pagamento confirmado!" : "Aguardando pagamento…"}
                       </p>
                     </>
                   )}
                 </div>
 
-                {/* RESUMO DO PEDIDO */}
+                {/* RESUMO */}
                 <div className="pix-card">
                   <h3 style={{ fontSize: 20, fontWeight: 700 }}>
                     Resumo do Pedido
@@ -426,15 +272,13 @@ export default function PixPage() {
                     {title} — {cart?.quantity} unidade(s)
                   </div>
 
-                  <div
-                    style={{
-                      marginTop: 14,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      fontSize: 18,
-                      fontWeight: 600,
-                    }}
-                  >
+                  <div style={{
+                    marginTop: 14,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    fontSize: 18,
+                    fontWeight: 600,
+                  }}>
                     <span>Total</span>
                     <span>R$ {formatBR(amount)}</span>
                   </div>
@@ -447,25 +291,21 @@ export default function PixPage() {
                     Voltar
                   </button>
                 </div>
+
               </div>
 
               {error && (
-                <div
-                  style={{ marginTop: 14, color: "red", textAlign: "center" }}
-                >
+                <div style={{ marginTop: 14, color: "red", textAlign: "center" }}>
                   {error}
                 </div>
               )}
+
             </div>
           </div>
 
           <FooterEventim />
         </div>
       </div>
-
-      {copied && (
-        <div className="pix-toast">Código PIX copiado com sucesso!</div>
-      )}
     </>
   );
 }

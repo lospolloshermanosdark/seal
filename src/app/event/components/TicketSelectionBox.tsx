@@ -4,7 +4,8 @@ export default function TicketSelectionBox() {
   return (
     <section
       data-c="ticketselectionbox2"
-      className="container margin-top-xxl"
+      className="container margin-top-xxl "
+      style={{padding: "0 10px"}}
     >
       <div className="row">
         <div className="col-xs-12">

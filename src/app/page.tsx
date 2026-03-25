@@ -1,33 +1,33 @@
 "use client";
 
-import F1Main from "@/components/F1Main/F1Main";
+import { ArtistBazaarvoiceWidget } from "@/components/artistbazaarvoicewidget";
+import { ArtistPortfolio } from "@/components/ArtistPortfolio";
+import { ArtistPortfolioGaleria } from "@/components/ArtistPortfolioGaleria";
+import { Artiststage } from "@/components/Artiststage";
+import { EditorialComponent } from "@/components/EditorialComponent";
+import { EventSelectionBox } from "@/components/EventSelectionBox";
 import { Footer } from "@/components/Footer";
-import F1Header from "@/components/ui/header";
-import Script from "next/script";
+import { Main } from "@/components/Main";
+import { ContrasteHeader } from "@/components/ui/contraste";
+import HeaderPrincipal from "@/components/ui/header";
 
 export default function Page() {
   return (
     <>
-      {/* CMP wrapper */}
-      <div id="cmpwrapper" className="cmpwrapper"></div>
+      <div className="wrapper wrapper-container  ">
+        <ContrasteHeader />
+        <HeaderPrincipal />
+        <Main>
+          <Artiststage />
+          <EventSelectionBox/>
+          <EditorialComponent />
+          <ArtistPortfolio />
+          <ArtistPortfolioGaleria />
+          <ArtistBazaarvoiceWidget />
+        </Main>
+        <Footer />
+      </div>
 
-      {/* Scripts específicos da página */}
- 
-
-      {/* iFrames ocultos */}
-      <iframe name="__cmapiLocator" style={{ display: "none" }} />
-      <iframe name="__cmpLocator" style={{ display: "none" }} />
-      <iframe name="__uspapiLocator" style={{ display: "none" }} />
-      <iframe name="__tcfapiLocator" style={{ display: "none" }} />
-
-  
-      {/* ADS placeholders */}
-      <div id="place-ad-top" className="center text-center" />
-      <div id="place-ad-top-duplicate" className="center text-center" />
-
-      <F1Header />
-      <F1Main />
-      <Footer />
     </>
   );
 }

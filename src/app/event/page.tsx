@@ -11,6 +11,9 @@ import { AdditionalBanner } from "./components/AdditionalBanner";
 import { BackToTop } from "./components/BackToTop";
 import { Breadcrumb } from "./components/Breadcrumb";
 import { Footer } from "./components/Footer";
+import { Artiststage } from "@/components/Artiststage";
+import { EventSelectionBox } from "@/components/EventSelectionBox";
+import { Main } from "@/components/Main";
 
 export default function EventPage() {
   return (
@@ -35,22 +38,22 @@ export default function EventPage() {
 
       {/* Script original em React -> controla zoom/contraste */}
       <AccessibilityScript />
+      <Header />
 
       {/* Conteúdo */}
       <div className="outer-bg u-text-color">
-        <div className="wrapper wrapper-container">
-          <Header />
-          <StageArtwork />
+
+        <Main>
+          <Artiststage />
           <TicketSelectionBox />
           <TicketSelectionFull />
           <AdditionalBanner />
-          <BackToTop />
-          <Breadcrumb />
-          <Footer/>
-        </div>
 
-
+        </Main>
       </div>
+      <BackToTop />
+      <Breadcrumb />
+      <Footer />
     </>
   );
 }

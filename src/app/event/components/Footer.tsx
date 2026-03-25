@@ -1,6 +1,6 @@
 export function Footer() {
     const footerHtml = `
-    <footer data-c="footerfull" id="footer" class="c c-full-grey c-inner no-padding-bottom footerfull " data-qa="footerfull-component">
+    <footer  data-c="footerfull" id="footer" class="c c-full-grey c-inner no-padding-bottom footerfull " data-qa="footerfull-component">
       <svg width="0" height="0" style="position:absolute">
         <symbol viewBox="0 0 48 32" id="icon-flag-AT" xmlns="http://www.w3.org/2000/svg">
           <g fill="none" fill-rule="evenodd">
@@ -296,7 +296,9 @@ export function Footer() {
           </g>
         </symbol>
       </svg>
-      <div class="container">
+      <div style="
+    padding: 3px 16px;
+" class="container">
         <div class="footerfull-accordion info-accordion full-width visible-xs js-accordion">
           <ul class="footerfull-linklist info-accordion-section theme-element-border js-accordion-slide" role="presentation">
             <li class="footerfull-linklist-item info-accordion-item js-accordion-trigger" aria-expanded="false" role="button" tabindex="0" data-qa="triggerAccordion">
@@ -372,7 +374,7 @@ export function Footer() {
               </ul>
             </li>
           </ul>
-          <ul class="footerfull-linklist info-accordion-section theme-element-border js-accordion-slide" role="presentation">
+          <ul  class="footerfull-linklist info-accordion-section theme-element-border js-accordion-slide" role="presentation">
             <li class="footerfull-linklist-item info-accordion-item js-accordion-trigger" aria-expanded="false" role="button" tabindex="0" data-qa="triggerAccordion">
               <div class="footerfull-linklist-item-name info-accordion-name">
                 <div class="u-flex u-flex-justify-between">
@@ -454,7 +456,9 @@ export function Footer() {
             </li>
           </ul>
         </div>
-        <div class="footerfull-accordion info-accordion full-width hidden-xs">
+        <div  style="
+    padding: 3px 16px;
+"  class="footerfull-accordion info-accordion full-width hidden-xs">
           <ul class="footerfull-linklist info-accordion-section theme-element-border">
             <li class="footerfull-linklist-item info-accordion-item">
               <div class="footerfull-linklist-item-name info-accordion-name">
@@ -597,7 +601,9 @@ export function Footer() {
           </ul>
         </div>
       </div>
-      <div class="container">
+      <div style="
+    padding: 3px 16px;
+"  class="container">
         <div class="footerfull-mid-section full-width">
           <div class="footerfull-secondary">
             <ul class="footerfull-linklist">

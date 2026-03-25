@@ -1,44 +1,51 @@
-// src/app/api/pix/create/route.ts
+// app/api/pix/create/route.ts
+
+import { getPixGateway } from "@/app/pix/PixService";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const incoming = await req.json();
+    const body = await req.json();
+    const { gateway } = body;
 
-    const PUBLIC_KEY = process.env.PAYLOOP_PUBLIC_KEY!;
-    const SECRET_KEY = process.env.PAYLOOP_SECRET_KEY!;
-
-    const credentials = Buffer.from(`${PUBLIC_KEY}:${SECRET_KEY}`).toString("base64");
-
-    // ============================================
-    // GARANTIR QUE SEMPRE TENHA EXTERNAL REF
-    // ============================================
-    const externalRef = incoming.externalRef || incoming.orderNumber || `PED-${Date.now()}`;
-
-    const body = {
-      ...incoming,
-      externalRef, // ← ESSA LINHA É O QUE FAZ O PAGLOOP ENVIAR NO WEBHOOK
-    };
-
-    const res = await fetch("https://api.pagloop.com/v1/transactions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Basic ${credentials}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(body)
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      return NextResponse.json({ error: true, data }, { status: res.status });
+    // validação básica
+    if (!body.amount || !body.customer) {
+      return NextResponse.json(
+        { error: "Dados incompletos" },
+        { status: 400 }
+      );
     }
 
-    return NextResponse.json(data);
+    if (!gateway) {
+      return NextResponse.json(
+        { error: "Gateway não informado" },
+        { status: 400 }
+      );
+    }
 
-  } catch (e) {
-    console.error("Erro no create PIX:", e);
-    return NextResponse.json({ error: true }, { status: 500 });
+    let normalized;
+
+    try {
+      // gateway principal
+      const gw = getPixGateway(gateway);
+      normalized = await gw.create(body);
+
+    } catch (err) {
+      console.warn("Gateway principal falhou, tentando fallback...");
+
+      // fallback automático
+      const fallback = getPixGateway("blackcat");
+      normalized = await fallback.create(body);
+    }
+
+    return NextResponse.json(normalized);
+
+  } catch (err: any) {
+    console.error("PIX ERROR:", err);
+
+    return NextResponse.json(
+      { error: err.message ?? "Erro ao gerar PIX" },
+      { status: 500 }
+    );
   }
 }

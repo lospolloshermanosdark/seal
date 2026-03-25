@@ -4,7 +4,9 @@ import { useEffect } from "react";
 
 export function Accordion() {
   const html = `
-<div class="card card-default-text info-accordion js-accordion standard-gray-shadow margin-bottom-s">
+<div style="
+    padding: 23px 26px;
+" class="card card-default-text info-accordion js-accordion standard-gray-shadow margin-bottom-s">
 
   <div class="info-accordion-section theme-element-border js-accordion-slide">
     <div class="info-accordion-item js-accordion-trigger" aria-expanded="false" role="button" tabindex="0">

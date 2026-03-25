@@ -1,50 +1,86 @@
 // src/app/api/postback/route.ts
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const payload = await req.json();
 
-    const externalRef = body?.data?.externalRef;
-    const status = body?.data?.status;
 
-    if (!externalRef) {
+    /**
+     * Estrutura esperada (exemplo PagLoop):
+     * {
+     *   id: "tx_123",
+     *   status: "paid",
+     *   amount: 3000,
+     *   paidAmount: 3000,
+     *   externalRef: "PED-123456"
+     * }
+     */
+
+    const {
+      id,
+      status,
+      amount,
+      paidAmount,
+      externalRef,
+    } = payload || {};
+
+    // ==========================
+    // ✅ VALIDAÇÕES OBRIGATÓRIAS
+    // ==========================
+    if (!id || !status || !externalRef) {
+      console.error("❌ Postback inválido:", payload);
+
       return NextResponse.json(
-        { error: "Missing externalRef" },
+        { error: "Payload inválido" },
         { status: 400 }
       );
     }
 
-    // 1. Buscar pedido
-    const { data: order } = await supabaseAdmin
-      .from("orders")
-      .select("*, customers(*)")
-      .eq("external_ref", externalRef)
-      .single();
+    // ==========================
+    // ✅ PROCESSAR SOMENTE SE PAGO
+    // ==========================
+    if (status !== "paid") {
 
-    if (!order) {
-      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      return NextResponse.json(
+        { received: true, ignored: true },
+        { status: 200 }
+      );
     }
 
-    // 2. Evitar duplicação — mas NÃO bloquear e-mail
-    const jaPago = order.payment_status === "paid";
+    // ==========================
+    // ✅ AQUI VOCÊ MARCA O PEDIDO COMO PAGO
+    // (BANCO DE DADOS OU ERP)
+    // ==========================
 
-    // 3. Só processa pagamento quando o status for paid mesmo
-    if (status === "paid") {
-      // Se ainda não estava pago, atualiza no banco
-      if (!jaPago) {
-        await supabaseAdmin
-          .from("orders")
-          .update({ payment_status: "paid" })
-          .eq("external_ref", externalRef);
-      } else {
-      }
-    }
+    /*
+      EXEMPLO (quando tiver banco):
 
-    return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error("[WEBHOOK] Erro fatal:", err);
-    return NextResponse.json({ error: true }, { status: 500 });
+      await prisma.orders.update({
+        where: { externalRef },
+        data: {
+          status: "paid",
+          paidAt: new Date(),
+          transactionId: id,
+          paidAmount,
+        }
+      });
+    */
+
+    // ==========================
+    // ✅ SEMPRE RESPONDER 200 PARA O GATEWAY
+    // ==========================
+    return NextResponse.json(
+      { success: true },
+      { status: 200 }
+    );
+
+  } catch (e) {
+    console.error("❌ ERRO NO POSTBACK:", e);
+
+    return NextResponse.json(
+      { error: true },
+      { status: 500 }
+    );
   }
 }

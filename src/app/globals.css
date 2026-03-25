@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -1177,4 +1178,102 @@ SEM ALTERAR NADA */
   .nf-card {
     width: 360px;
   }
+}
+
+
+ .viewMore:hover,
+    .viewMore:focus {
+      text-decoration: none;
+    }
+
+    .uid1142474 .viewMore {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .uid1142474 .viewMore i.fa {
+      margin-right: 5px;
+    }
+
+    .viewMore:hover,
+    .viewMore:focus {
+      text-decoration: none;
+    }
+
+    .uid1142465 .viewMore {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .uid1142465 .viewMore i.fa {
+      margin-right: 5px;
+    }
+
+     .viewMore:hover,
+    .viewMore:focus {
+      text-decoration: none;
+    }
+
+    .uid1142456 .viewMore {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .uid1142456 .viewMore i.fa {
+      margin-right: 5px;
+    }
+
+    .viewMore:hover,
+    .viewMore:focus {
+      text-decoration: none;
+    }
+
+    .uid1142447 .viewMore {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .uid1142447 .viewMore i.fa {
+      margin-right: 5px;
+    }
+
+       .viewMore:hover,
+    .viewMore:focus {
+      text-decoration: none;
+    }
+
+    .uid1142429 .viewMore {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .uid1142429 .viewMore i.fa {
+      margin-right: 5px;
+    }
+
+    
+
+    .swiper-slide {
+  opacity: 0.4;
+  transition: 0.3s;
+}
+
+.swiper-slide-active {
+  opacity: 1;
+  transform: scale(1.02);
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+  color: #000;
+  background: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }

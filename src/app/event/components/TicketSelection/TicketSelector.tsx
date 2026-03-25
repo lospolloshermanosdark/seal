@@ -1,103 +1,283 @@
 "use client";
 
 import { gerarTicketHTML } from "@/app/utils/gerarTickets";
-import { setores } from "@/app/utils/setores";
+import { eventosSeal } from "@/app/utils/setores";
 import { useEffect, useState } from "react";
 
 export default function TicketSelector() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [evento, setEvento] = useState<any>(null);
+  const [selectedSector, setSelectedSector] = useState<any>(null);
 
-  // 👉 CAPTURA O SETOR DA URL
-  const [selectedSector, setSelectedSector] = useState<string>("") as any;
-useEffect(() => {
-  const params = new URLSearchParams(window.location.search);
-  const setorId = params.get("id");
+  // 🔥 CAPTURA CIDADE + SETOR
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
 
-  if (setorId && setores[setorId]) {
-    setSelectedSector(setores[setorId]); // setor escolhido
-  } else {
-    setSelectedSector(setores["setor-a"]); // setor padrão
-  }
-}, []);
+    const cidadeParam = params.get("cidade");
 
-  // CONFIGURAÇÕES DOS INGRESSOS (dinâmico)
-  const ticketsData = selectedSector?.tickets || [];
+    const cidade = (cidadeParam === "sao-paulo"
+      ? "sao-paulo"
+      : "rio-de-janeiro") as keyof typeof eventosSeal;
+    const setorId = params.get("setor");
 
+    const eventoAtual = eventosSeal[cidade];
 
-  // INSERE DINAMICAMENTE O SETOR NO HTML
+    if (!eventoAtual) return;
+
+    setEvento(eventoAtual);
+
+    if (setorId) {
+      const found = eventoAtual.setores.find((s: any) => s.id === setorId);
+      if (found) {
+        setSelectedSector(found);
+        return;
+      }
+    }
+
+    setSelectedSector(eventoAtual.setores[0]);
+  }, []);
+
+  // 🎯 GERAR TICKETS
+  const gerarTickets = () => {
+    if (!selectedSector) return [];
+
+    const { prices, id } = selectedSector;
+
+    return [
+      {
+        id: `${id}_MEIA`,
+        nome: "MEIA ENTRADA",
+        preco: prices.meia,
+      },
+      {
+        id: `${id}_ITAU`,
+        nome: "CLIENTE ITAÚ",
+        preco: prices.itau,
+      },
+      {
+        id: `${id}_INT`,
+        nome: "INTEIRA",
+        preco: prices.inteira,
+      },
+    ];
+  };
+
+  const ticketsData = gerarTickets();
+
+  // HTML
   const htmlForm = `
-<div class="event-list-item">
-  <div class="event-list-item margin-bottom-s u-shadow standard-gray-shadow js-pc-card" data-qa="price-category">
+<div class="event-list-item" style>
+  <div class="event-list-item margin-bottom-s u-shadow standard-gray-shadow">
 
-    <div class="event-list-item-wrapper pc-list-item-space clearfix js-product-type" data-cc-formcount="0_1_tickets">
-      <div class="not-in-focus js-not-in-focus" style="display: none;"></div>
+    <div class="event-list-item-wrapper clearfix">
 
-      <form class="event-list-content js-focus-item js-form-timestamp"
-            action="https://seguro.ingressosf12026saopaulo.site/api/public/shopify?product=1839015532257&store=18390&id=orangeTreeClub"
-            name="pk40500187"
-            method="post"
-            data-qa="pc-list-number-PLATEIA">
+      <form class="event-list-content" style="
+    padding: 23px 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+">
 
-        <!-- INPUTS OCULTOS (mantidos) -->
-        <input type="hidden" name="token" value="NSUAMXVVQYXHEOO">
-        <input type="hidden" name="fun" value="wk">
-        <input type="hidden" name="doc" value="shoppingCart">
-        <input type="hidden" name="affiliate" value="F1M">
-        <input type="hidden" name="ev_id" value="20759396" class="js-cc-evid">
-        <input type="hidden" name="pk_id" value="40500187" class="js-cc-pkid-1">
-        <input type="hidden" name="timestamp" value="" class="js-timestamp-input">
-        <input type="hidden" name="backToPrevPage" value="/event/trilhas-noite-cheia-de-lua-de-sol-palacio-das-artes-20759396/?affiliate=F1M" class="js-cc-back">
-        <input type="hidden" name="errordoc" value="globalError">
-        <input type="hidden" name="promo_id" value="0" class="js-cc-promoid-1">
-
-        <!-- CABEÇALHO DO SETOR -->
-        <div class="pc-list-detail event-list-head">
-          <div class="pc-list-category">
-            <span id="sectorTitle">${selectedSector?.nome || "..."}</span>
+        <!-- 🔥 HEADER EVENTO -->
+        <div style="padding:10px 0;border-bottom:1px solid #eee;margin-bottom:10px;width: 100%;">
+          <strong>${evento?.nome || ""}</strong> — ${evento?.local || ""}
+          <div style="font-size:12px;color:#666;">
+            ${evento?.data || ""}
           </div>
         </div>
+<div class="event-list-item margin-bottom-s u-shadow standard-gray-shadow js-pc-card" style="width: 100%">
+   
 
+${evento?.setores
+  .map((setor: any) => {
+    const tickets = [
+      {
+        id: `${setor.id}_MEIA`,
+        nome: "MEIA ENTRADA",
+        preco: setor.prices.meia,
+      },
+      {
+        id: `${setor.id}_ITAU`,
+        nome: "CLIENTE ITAÚ",
+        preco: setor.prices.itau,
+      },
+      {
+        id: `${setor.id}_INT`,
+        nome: "INTEIRA",
+        preco: setor.prices.inteira,
+      },
+    ];
 
-        <!-- 🎯 LISTA DE TICKETS DINÂMICOS -->
-        <div class="event-list-content-item clearfix js-stepper-sum js-ticket-selection-with-limits"
-             data-event-has-sections="false">
+    return `
+      <div style="
+        border-radius:18px;
+        padding:16px;
+        margin-bottom:16px;
+        background:#fff;
+        box-shadow:0 8px 22px rgba(0,0,0,0.06);
+        widht
+      ">
 
-          <div class="ticket-type-list">
-
-            <!-- AQUI ENTRA O GERADOR -->
-            ${ticketsData.map(gerarTicketHTML).join("")}
-
+        <!-- HEADER -->
+        <div style="
+          display:flex;
+          flex-direction:column;
+          gap:6px;
+          margin-bottom:12px;
+        ">
+          <div style="
+            font-size:16px;
+            font-weight:700;
+          ">
+            ${setor.nome}
           </div>
 
-
-          <!-- CTA PRINCIPAL -->
-          <div class="clearfix ticket-type-cta">
-            <button type="submit"
-              class="btn btn-primary btn-lg btn-block js-stepper-action js-cat-check-trigger js-cc-submit-btn"
-              data-cc-formcount="0_1_tickets"
-              data-pk-number="1"
-              disabled
-              style="display:none;">
-              
-              <i class="icon icon-cart"></i>
-              <span class="btn-text ticket-type-quantity js-stepper-quantity-display">0 Ingressos</span>,
-              <span class="btn-text ticket-type-sum js-stepper-sum-display">R$ 0,00</span>
-            </button>
+          <div style="
+            font-size:13px;
+            color:#666;
+          ">
+            A partir de <strong>R$ ${setor.prices.meia.toFixed(2)}</strong>
           </div>
 
+          ${
+            setor.highlight
+              ? `<div style="
+                  align-self:flex-start;
+                  background:#ff9800;
+                  color:#fff;
+                  font-size:11px;
+                  padding:3px 8px;
+                  border-radius:20px;
+                  font-weight:600;
+                ">
+                  MAIS VENDIDO
+                </div>`
+              : ""
+          }
         </div>
+
+        <!-- TICKETS -->
+        <div style="
+          display:flex;
+          flex-direction:column;
+          gap:10px;
+        ">
+          ${tickets
+            .map(
+              (ticket) => `
+              <div style="
+                border-radius:12px;
+                background:#f8f9fb;
+                padding:12px;
+                display:flex;
+                flex-direction:column;
+                gap:8px;
+              ">
+
+                <!-- TOP -->
+                <div style="
+                  display:flex;
+                  justify-content:space-between;
+                  align-items:center;
+                ">
+                  <span style="
+                    font-size:14px;
+                    font-weight:600;
+                  ">
+                    ${ticket.nome}
+                  </span>
+
+                  <span style="
+                    font-size:16px;
+                    font-weight:700;
+                    color:#111;
+                  ">
+                    R$ ${ticket.preco.toFixed(2)}
+                  </span>
+                </div>
+
+                <!-- ACTION -->
+                <div style="
+                  display:flex;
+                  justify-content:flex-end;
+                ">
+                  ${gerarTicketHTML(ticket)}
+                </div>
+
+              </div>
+            `
+            )
+            .join("")}
+        </div>
+
+      </div>
+    `;
+  })
+  .join("")}
+</div>
+  
 
       </form>
     </div>
   </div>
 </div>
+
+<!-- 🔥 SUMMARY FIXO -->
+<div style="
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:#fff;
+  border-top:1px solid #ddd;
+  padding:14px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 -4px 12px rgba(0,0,0,0.08);
+  z-index:999;
+">
+
+  <div>
+    <div class="js-stepper-quantity-display" style="
+      font-size:14px;
+      color:#666;
+    ">
+      0 Ingressos
+    </div>
+
+    <div class="js-stepper-sum-display" style="
+      font-size:18px;
+      font-weight:700;
+      color:#111;
+    ">
+      R$ 0,00
+    </div>
+  </div>
+
+  <button class="js-cc-submit-btn" disabled style="
+    background:#0B74FF;
+    color:#fff;
+    border:none;
+    padding:14px 22px;
+    border-radius:10px;
+    font-weight:600;
+    cursor:pointer;
+    opacity:0.5;
+    transition:.2s;
+  ">
+    Continuar
+  </button>
+
+</div>
 `;
 
-  // LÓGICA DO EVENTIM
+  // LÓGICA STEP
   useEffect(() => {
     const interval = setInterval(() => {
-      const plusButtons = document.querySelectorAll(".ticket-type-stepper .btn-stepper-right");
-      const minusButtons = document.querySelectorAll(".ticket-type-stepper .btn-stepper-left");
+      const plusButtons = document.querySelectorAll(".btn-stepper-right");
+      const minusButtons = document.querySelectorAll(".btn-stepper-left");
       const amounts = document.querySelectorAll(".btn-stepper-amount");
       const items = document.querySelectorAll(".js-ticket-type-item");
 
@@ -106,8 +286,7 @@ useEffect(() => {
 
       plusButtons.forEach((btn, index) => {
         btn.addEventListener("click", () => {
-          const internalId = "ID_" + index;
-          setSelectedId(internalId);
+          setSelectedId("ID_" + index);
           updateStepper(index);
         });
       });
@@ -130,7 +309,6 @@ useEffect(() => {
           const isActive = activeIndex === i;
 
           amt.textContent = isActive ? "1" : "0";
-
           minus.disabled = !isActive;
           plus.disabled = isActive;
 
@@ -141,35 +319,63 @@ useEffect(() => {
         const qty = document.querySelector(".js-stepper-quantity-display") as HTMLElement;
         const sum = document.querySelector(".js-stepper-sum-display") as HTMLElement;
 
-        cta.style.display = "block";
-
+        cta.style.opacity = activeIndex !== null ? "1" : "0.5";
+        cta.style.pointerEvents = activeIndex !== null ? "auto" : "none";
         if (activeIndex !== null) {
-          const ticket = ticketsData[activeIndex];
 
-          cta.classList.remove("disabled");
-          cta.removeAttribute("disabled");
+          const allTickets = evento?.setores.flatMap((setor: any) => [
+            {
+              id: `${setor.id}_MEIA`,
+              nome: "MEIA ENTRADA",
+              preco: setor.prices.meia,
+            },
+            {
+              id: `${setor.id}_ITAU`,
+              nome: "CLIENTE ITAÚ",
+              preco: setor.prices.itau,
+            },
+            {
+              id: `${setor.id}_INT`,
+              nome: "INTEIRA",
+              preco: setor.prices.inteira,
+            },
+          ]);
 
-          const valorFormatado = ticket.preco.toLocaleString("pt-BR") + ",00";
+          const ticket = allTickets[activeIndex];
+
+
+          const valorFormatado = ticket.preco.toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          });
 
           qty.textContent = `1 Ingresso`;
           sum.textContent = `R$ ${valorFormatado}`;
 
-          // REDIRECIONA PARA O CHECKOUT COM SETOR DA URL
+          cta.removeAttribute("disabled");
+
           cta.onclick = (e) => {
             e.preventDefault();
 
-            const url = `/checkout?id=${ticket.id}&nome=${encodeURIComponent(ticket.nome)}&preco=${ticket.preco}&setor=${encodeURIComponent(selectedSector?.nome || "")}`;
+            const url =
+              "/checkout?id=" +
+              ticket.id +
+              "&nome=" +
+              encodeURIComponent(ticket.nome) +
+              "&preco=" +
+              ticket.preco +
+              "&cidade=" +
+              encodeURIComponent(evento?.nome || "") +
+              "&setor=" +
+              encodeURIComponent(selectedSector?.id || "");
 
             window.location.href = url;
           };
         } else {
-          cta.classList.add("disabled");
           cta.setAttribute("disabled", "");
 
           qty.textContent = "0 Ingressos";
           sum.textContent = "R$ 0,00";
-
-          cta.onclick = (e) => e.preventDefault();
         }
       }
 
@@ -182,7 +388,7 @@ useEffect(() => {
     }, 50);
 
     return () => clearInterval(interval);
-  }, [selectedId, selectedSector]);
+  }, [selectedId, selectedSector, evento]);
 
   return <div dangerouslySetInnerHTML={{ __html: htmlForm }} />;
 }

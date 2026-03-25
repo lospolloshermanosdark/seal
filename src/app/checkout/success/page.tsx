@@ -1,37 +1,44 @@
-
-// src/app/checkout/success/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { formatBR } from "@/app/utils/format";
 import HeaderCheckout from "../components/HeaderCheckout";
 import FooterEventim from "../components/FooterEventim";
 
 export default function SuccessPage() {
   const router = useRouter();
-  const [order, setOrder] = useState<any>(null);
 
-useEffect(() => {
-  const saved = localStorage.getItem("currentOrder");
-  if (!saved) {
-    router.push("/checkout");
-    return;
-  }
+  const [customer, setCustomer] = useState<any>(null);
+  const [ready, setReady] = useState(false);
 
-  setOrder(JSON.parse(saved));
-}, []);
+  const orderRef = useRef(`PED-${Date.now().toString().slice(-6)}`);
 
-// Agora vamos limpar DEPOIS que a página carregou corretamente
-useEffect(() => {
-  if (order) {
-    localStorage.removeItem("cart");
-    localStorage.removeItem("customer");
-    localStorage.removeItem("currentOrder");
-  }
-}, [order]);
+  // 🔥 pega customer (opcional)
+  useEffect(() => {
+    try {
+      const cust = localStorage.getItem("customer");
+      if (cust) setCustomer(JSON.parse(cust));
+    } catch {}
+    
+    setReady(true);
+  }, []);
 
-  if (!order) return null;
+  // 🔥 LIMPEZA SEGURA
+  useEffect(() => {
+    if (!ready) return;
+
+    const timeout = setTimeout(() => {
+      try {
+        localStorage.removeItem("cart");
+        localStorage.removeItem("currentPixOrder");
+        // 🔴 NÃO limpar customer (importante pra retenção)
+      } catch {}
+    }, 4000); // espera 4s (UX)
+
+    return () => clearTimeout(timeout);
+  }, [ready]);
+
+  if (!ready) return null;
 
   return (
     <>
@@ -41,11 +48,9 @@ useEffect(() => {
       <style>{`
         .success-wrapper {
           display: flex;
-          flex-direction: column;
           justify-content: center;
           align-items: center;
-          text-align: center;
-          padding: 48px 24px;
+          padding: 40px 16px;
           background: #f3f4f7;
         }
 
@@ -55,13 +60,8 @@ useEffect(() => {
           padding: 32px;
           max-width: 520px;
           width: 100%;
-          box-shadow: 0 8px 22px rgba(0,0,0,0.08);
-          animation: fadeIn 0.6s ease-out;
-        }
-
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to   { opacity: 1; transform: translateY(0); }
+          box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+          text-align: center;
         }
 
         .checkmark {
@@ -72,108 +72,113 @@ useEffect(() => {
           display: flex;
           align-items: center;
           justify-content: center;
-          margin: 0 auto 22px;
-          animation: scaleIn 0.4s ease-out;
-        }
-
-        @keyframes scaleIn {
-          0% { transform: scale(0.2); opacity: 0; }
-          100% { transform: scale(1); opacity: 1; }
-        }
-
-        .checkmark svg {
-          width: 58px;
-          height: 58px;
-          color: white;
+          margin: 0 auto 20px;
         }
 
         .order-box {
           background: #eef2ff;
           border: 1px solid #d0d7ff;
-          padding: 12px 18px;
+          padding: 12px;
           border-radius: 10px;
           margin: 20px 0;
           font-weight: bold;
-          font-size: 16px;
           color: #3347b0;
         }
 
-        .success-btn {
+        .info-box {
+          margin-top: 18px;
+          padding: 16px;
+          background: #f5f7ff;
+          border: 1px solid #d6ddff;
+          border-radius: 10px;
+          text-align: left;
+          font-size: 14px;
+        }
+
+        .btn-primary {
           width: 100%;
-          padding: 14px 0;
+          padding: 14px;
           border-radius: 10px;
           background: #0B74FF;
           color: white;
-          font-size: 18px;
-          margin-top: 20px;
           border: none;
+          margin-top: 20px;
           cursor: pointer;
         }
 
-        .success-btn:hover {
-          background: #005ed6;
-        }
-
-        .outline-btn {
+        .btn-outline {
           width: 100%;
-          padding: 14px 0;
+          padding: 14px;
           border-radius: 10px;
           border: 2px solid #0B74FF;
           color: #0B74FF;
           background: white;
-          font-size: 17px;
           margin-top: 12px;
           cursor: pointer;
-        }
-
-        .outline-btn:hover {
-          background: #eef4ff;
         }
       `}</style>
 
       <HeaderCheckout />
 
-      <div className="wrapper success-wrapper">
+      <div className="success-wrapper">
         <div className="success-card">
 
           <div className="checkmark">
-            <svg viewBox="0 0 24 24" fill="none">
+            <svg viewBox="0 0 24 24">
               <path
                 d="M20 6L9 17l-5-5"
                 stroke="white"
                 strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                fill="none"
               />
             </svg>
           </div>
 
-          <h2 style={{ fontWeight: 700, fontSize: 26 }}>Pagamento Confirmado!</h2>
-          <p style={{ marginTop: 8, fontSize: 16, color: "#333" }}>
-            Seu pedido foi processado com sucesso.
-          </p>
+          <h2 style={{ fontSize: 26, fontWeight: 700 }}>
+            Pagamento confirmado!
+          </h2>
+
+          <p>Seu pedido foi aprovado com sucesso.</p>
 
           <div className="order-box">
-            Pedido <strong>{order.externalRef}</strong>
+            Pedido <strong>{orderRef.current}</strong>
           </div>
 
-          <p style={{ marginTop: 12, fontSize: 17 }}>
-            {order.title} — <strong>R$ {formatBR(order.amount)}</strong>
-          </p>
+          {customer?.firstName && (
+            <p>
+              Cliente:{" "}
+              <strong>
+                {customer.firstName} {customer.lastName}
+              </strong>
+            </p>
+          )}
 
-          <button
-            className="success-btn"
-            onClick={() => router.push("/")}
-          >
-            Voltar ao Início
+          {customer?.email && (
+            <p>
+              Enviaremos para: <strong>{customer.email}</strong>
+            </p>
+          )}
+
+          <div className="info-box">
+            <strong>📩 Seus ingressos:</strong>
+            <ul style={{ marginTop: 8 }}>
+              <li>Envio em até <strong>24 a 48 horas</strong></li>
+              <li>Verifique spam ou lixo eletrônico</li>
+              <li>Use o email cadastrado na compra</li>
+            </ul>
+          </div>
+
+          <button className="btn-primary" onClick={() => router.push("/")}>
+            Voltar ao início
           </button>
 
           <button
-            className="outline-btn"
-            onClick={() => router.push("/meus-pedidos")}
+            className="btn-outline"
+            onClick={() => window.open("https://wa.me/SEUNUMERO")}
           >
-            Ver meus pedidos
+            Falar com suporte
           </button>
+
         </div>
       </div>
 

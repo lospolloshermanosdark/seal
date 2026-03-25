@@ -1,11 +1,7 @@
 export default function Head() {
   return (
     <>
-      <link
-        id="ev-style-sheet"
-        rel="stylesheet"
-        href="/eventim/css/patterns.css"
-      />
+
 
       <link
         id="contrast-style"
@@ -16,6 +12,14 @@ export default function Head() {
       />
 
       <link rel="stylesheet" href="/eventim/css/checkout.css" />
+
+            <link
+        id="ev-style-sheet"
+        rel="stylesheet"
+        href="/eventim/css/patterns.css"
+      />
     </>
+
+    
   );
 }

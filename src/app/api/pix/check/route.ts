@@ -1,40 +1,58 @@
-// src/app/api/pix/check/route.ts
+// app/api/pix/check/route.ts
+
+import { getPixGateway } from "@/app/pix/PixService";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
+
     const txId = url.searchParams.get("id");
+    const gatewayType = url.searchParams.get("gateway");
 
     if (!txId) {
-      return NextResponse.json({ error: "Missing id" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing transaction id" },
+        { status: 400 }
+      );
     }
 
-    const PUBLIC_KEY = process.env.PAYLOOP_PUBLIC_KEY!;
-    const SECRET_KEY = process.env.PAYLOOP_SECRET_KEY!;
+    if (!gatewayType) {
+      return NextResponse.json(
+        { error: "Gateway não informado" },
+        { status: 400 }
+      );
+    }
 
-    const credentials = Buffer.from(`${PUBLIC_KEY}:${SECRET_KEY}`).toString("base64");
+    let result;
 
-    const res = await fetch(`https://api.pagloop.com/v1/transactions/${txId}`, {
-      method: "GET",
-      headers: {
-        "Authorization": `Basic ${credentials}`,
-        "Content-Type": "application/json"
-      }
-    });
+    try {
+      // gateway principal
+      const gateway = getPixGateway(gatewayType);
+      result = await gateway.check(txId);
 
-    const data = await res.json();
+    } catch (err) {
+      console.warn("Gateway principal falhou no check, tentando fallback...");
+
+      // fallback (opcional, mas útil)
+      const fallback = getPixGateway("blackcat");
+      result = await fallback.check(txId);
+    }
 
     return NextResponse.json({
-      id: data.id,
-      status: data.status,
-      paid: data.status === "paid",
-      amount: data.amount,
-      paidAmount: data.paidAmount,
+      paid: result.paid,
+      status: result.status,
     });
 
-  } catch (e) {
-    console.error("CHECK ERROR:", e);
-    return NextResponse.json({ error: true }, { status: 500 });
+  } catch (error: any) {
+    console.error("PIX CHECK ERROR:", error);
+
+    return NextResponse.json(
+      {
+        error: true,
+        message: error.message ?? "Erro interno ao consultar transação",
+      },
+      { status: 500 }
+    );
   }
 }

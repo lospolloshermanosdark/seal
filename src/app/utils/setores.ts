@@ -1,218 +1,96 @@
-//src/app/utils/setores.ts
-export const setores: any = {
-  "setor-a": {
-    nome: "Setor A",
-    precoBase: 459,
-    tickets: [
-      { id: "A_INT", nome: "INTEIRA", preco: 459 },
-      { id: "A_MEIA", nome: "MEIA ENTRADA", preco: 459 / 2 },
-      { id: "A_IDOSO", nome: "MEIA IDOSO", preco: 459 / 2 },
-      { id: "A_PCD", nome: "MEIA PCD", preco: 459 / 2 },
-    ],
-  },
+// src/app/utils/setores.ts
 
-  "setor-b": {
-    nome: "Setor B",
-    precoBase: 5290,
-    tickets: [
-      { id: "B_INT", nome: "INTEIRA", preco: 5290 },
-      { id: "B_MEIA", nome: "MEIA ENTRADA", preco: 5290 / 2 },
-      { id: "B_IDOSO", nome: "MEIA IDOSO", preco: 5290 / 2 },
-      { id: "B_PCD", nome: "MEIA PCD", preco: 5290 / 2 },
-    ],
-  },
+export const eventosSeal = {
+  "rio-de-janeiro": {
+    nome: "Rio de Janeiro",
+    local: "Qualistage",
+    data: "26/11/2026",
 
-  "setor-d": {
-    nome: "Setor D",
-    precoBase: 4680,
-    tickets: [
-      { id: "D_INT", nome: "INTEIRA", preco: 4680 },
-      { id: "D_MEIA", nome: "MEIA ENTRADA", preco: 4680 / 2 },
-      { id: "D_IDOSO", nome: "MEIA IDOSO", preco: 4680 / 2 },
-      { id: "D_PCD", nome: "MEIA PCD", preco: 4680 / 2 },
-    ],
-  },
-
-  "setor-g": {
-    nome: "Setor G",
-    precoBase: 495,
-    tickets: [
-      { id: "G_INT", nome: "INTEIRA", preco: 495 },
-      { id: "G_MEIA", nome: "MEIA ENTRADA", preco: 495 / 2 },
-      { id: "G_IDOSO", nome: "MEIA IDOSO", preco: 495 / 2 },
-      { id: "G_PCD", nome: "MEIA PCD", preco: 495 / 2 },
-    ],
-  },
-
-  "setor-h": {
-    nome: "Setor H",
-    precoBase: 1425,
-    tickets: [
-      { id: "H_INT", nome: "INTEIRA", preco: 1425 },
-      { id: "H_MEIA", nome: "MEIA ENTRADA", preco: 1425 / 2 },
-      { id: "H_IDOSO", nome: "MEIA IDOSO", preco: 1425 / 2 },
-      { id: "H_PCD", nome: "MEIA PCD", preco: 1425 / 2 },
-    ],
-  },
-
-  "setor-m": {
-    nome: "Setor M",
-    precoBase: 499,
-    tickets: [
-      { id: "M_INT", nome: "INTEIRA", preco: 499 },
-      { id: "M_MEIA", nome: "MEIA ENTRADA", preco: 499 / 2 },
-      { id: "M_IDOSO", nome: "MEIA IDOSO", preco: 499 / 2 },
-      { id: "M_PCD", nome: "MEIA PCD", preco: 499 / 2 },
-    ],
-  },
-
-  "setor-r": {
-    nome: "Setor R",
-    precoBase: 499,
-    tickets: [
-      { id: "R_INT", nome: "INTEIRA", preco: 499 },
-      { id: "R_MEIA", nome: "MEIA ENTRADA", preco: 499 / 2 },
-      { id: "R_IDOSO", nome: "MEIA IDOSO", preco: 499 / 2 },
-      { id: "R_PCD", nome: "MEIA PCD", preco: 499 / 2 },
-    ],
-  },
-
-  "orange-tree-club": {
-    nome: "Orange Tree Club",
-    precoBase: 8300,
-    tickets: [
-      { id: "OTC_INT", nome: "INTEIRA", preco: 8300 },
-      { id: "OTC_MEIA", nome: "MEIA ENTRADA", preco: 8300 / 2 },
-      { id: "OTC_IDOSO", nome: "MEIA IDOSO", preco: 8300 / 2 },
-      { id: "OTC_PCD", nome: "MEIA PCD", preco: 8300 / 2 },
-    ],
-  },
-
-  "pit-stop-club": {
-    nome: "Pit Stop Club",
-    precoBase: 10750,
-    tickets: [
-      { id: "PSC_INT", nome: "INTEIRA", preco: 10750 },
-      { id: "PSC_MEIA", nome: "MEIA ENTRADA", preco: 10750 / 2 },
-      { id: "PSC_IDOSO", nome: "MEIA IDOSO", preco: 10750 / 2 },
-      { id: "PSC_PCD", nome: "MEIA PCD", preco: 10750 / 2 },
-    ],
-  },
-
-  "grand-prix-club": {
-    nome: "Grand Prix Club",
-    precoBase: 20900,
-    tickets: [
-      { id: "GPC_INT", nome: "INTEIRA", preco: 20900 },
-      { id: "GPC_MEIA", nome: "MEIA ENTRADA", preco: 20900 / 2 },
-      { id: "GPC_IDOSO", nome: "MEIA IDOSO", preco: 20900 / 2 },
-      { id: "GPC_PCD", nome: "MEIA PCD", preco: 20900 / 2 },
-    ],
-  },
-
-  "heineken-village-estrela": {
-    nome: "HEINEKEN VILLAGE - ESTRELA",
-    procoBase: 2500,
-    tickets: [
+    setores: [
       {
-        id: "HNK_INT",
-        nome: "PREÇO ÚNICO",
-        preco: 2500,
+        id: "pista",
+        nome: "Pista",
+        prices: {
+          meia: 297.5,
+          itau: 505.75,
+          inteira: 595,
+        },
       },
       {
-        id: "HNK_CADEIRANTE",
-        nome: "CADEIRANTE",
-        preco: 2500,
+        id: "poltronas",
+        nome: "Poltronas",
+        prices: {
+          meia: 197.5,
+          itau: 335.75,
+          inteira: 395,
+        },
       },
       {
-        id: "HNK_CADEIRANTE_ACOMPA",
-        nome: "CADEIRANTE+ACOMPA",
-        preco: 2500,
+        id: "pista-premium",
+        nome: "Pista Premium",
+        highlight: true,
+        prices: {
+          meia: 497.5,
+          itau: 845.75,
+          inteira: 995,
+        },
       },
       {
-        id: "HNK_OBESO",
-        nome: "OBESO",
-        preco: 2500,
-      },
-      {
-        id: "HNK_OBESO_ACOMPA",
-        nome: "OBESO+ACOMPA",
-        preco: 2500,
-      },
-      {
-        id: "HNK_PCD",
-        nome: "PCD",
-        preco: 2500,
-      },
-      {
-        id: "HNK_PCD_ACOMPA",
-        nome: "PCD+ACOMPANHANTE",
-        preco: 2500,
+        id: "camarote-a",
+        nome: "Camarote A",
+        prices: {
+          meia: 647.5,
+          itau: 1100.75,
+          inteira: 1295,
+        },
       },
     ],
   },
 
-  "heineken-village-gramado": {
-    nome: "HEINEKEN VILLAGE - GRAMADO",
-    procoBase: 2100,
-    tickets: [
-      {
-        id: "HNK_INT",
-        nome: "PREÇO ÚNICO",
-        preco: 2100,
-      },
-      {
-        id: "MEIA ESTUDANTE",
-        nome: "MEIA ESTUDANTE",
-        preco: 1240,
-      },
-      {
-        id: "MEIAAPOSENTADO",
-        nome: "MEIA APOSENTADO",
-        preco: 1240,
-      },
-      {
-        id: "MEIA_escola_SP",
-        nome: "MEIA FUNC. ESCOLA SP",
-        preco: 1240,
-      },
+  "sao-paulo": {
+    nome: "São Paulo",
+    local: "Allianz Parque",
+    data: "28/11/2026",
 
+    setores: [
       {
-        id: "MEIA IDOSO",
-        nome: "MEIA IDOSO",
-        preco: 1240,
+        id: "cadeira-superior",
+        nome: "Cadeira Superior",
+        prices: {
+          meia: 172.5,
+          itau: 293.25,
+          inteira: 345,
+        },
       },
       {
-        id: "HNK_CADEIRANTE",
-        nome: "CADEIRANTE",
-        preco: 1240,
+        id: "cadeira-gold",
+        nome: "Cadeira Gold",
+        prices: {
+          meia: 347.5,
+          itau: 590.75,
+          inteira: 695,
+        },
       },
       {
-        id: "HNK_CADEIRANTE_ACOMPA",
-        nome: "CADEIRANTE+ACOMPA",
-        preco: 1240,
+        id: "cadeira-diamond",
+        nome: "Cadeira Diamond",
+        highlight: true,
+        prices: {
+          meia: 547.5,
+          itau: 930.75,
+          inteira: 1095,
+        },
       },
       {
-        id: "HNK_OBESO",
-        nome: "OBESO",
-        preco: 1240,
-      },
-      {
-        id: "HNK_OBESO_ACOMPA",
-        nome: "OBESO+ACOMPA",
-        preco: 1240,
-      },
-      {
-        id: "HNK_PCD",
-        nome: "PCD",
-        preco: 1240,
-      },
-      {
-        id: "HNK_PCD_ACOMPA",
-        nome: "PCD+ACOMPANHANTE",
-        preco: 1240,
+        id: "cadeira-vip",
+        nome: "Cadeira VIP",
+        highlight: true,
+        prices: {
+          meia: 897.5,
+          itau: 1525.75,
+          inteira: 1795,
+        },
       },
     ],
   },
-  //
 };

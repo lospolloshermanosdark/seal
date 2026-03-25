@@ -36,11 +36,7 @@ export default function CheckoutPage() {
   return (
     <>
       {/* CSS padrão local */}
-      <link
-        id="ev-style-sheet"
-        rel="stylesheet"
-        href="/eventim/css/patterns.css"
-      />
+   
 
       {/* CSS contraste local */}
       <link
@@ -52,7 +48,11 @@ export default function CheckoutPage() {
         disabled
       />
       <link rel="stylesheet" href="/eventim/css/checkout.css" />
-
+   <link
+        id="ev-style-sheet"
+        rel="stylesheet"
+        href="/eventim/css/patterns.css"
+      />
       {/* Acessibilidade */}
       <Accessibility />
 
