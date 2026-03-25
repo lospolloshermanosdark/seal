@@ -89,7 +89,7 @@ export default function PixPage() {
 
         // 🟢 CREATE PIX
         const payload = {
-          gateway: "blackcat",
+          gateway: "ironpay",
           amount,
           externalRef,
 
@@ -162,7 +162,7 @@ const startPolling = (pixId: string) => {
   pollRef.current = setInterval(async () => {
     try {
       const res = await fetch(
-        `/api/pix/check?id=${pixId}&gateway=blackcat`
+        `/api/pix/check?id=${pixId}&gateway=ironpay`
       );
 
       const json = await res.json();
