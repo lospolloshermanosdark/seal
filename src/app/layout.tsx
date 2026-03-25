@@ -24,11 +24,11 @@ const formula1 = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "FORMULA 1 MSC CRUISES GP São Paulo 2026",
+  title: "SEAL - EVENTIM",
   description:
-    "Compre seu ingresso para o FORMULA 1 MSC CRUISES GRANDE PRÊMIO DE SÃO PAULO 2026.",
+    "",
   icons: {
-    icon: "https://www.eventim.com.br/campaign/_assets/e20b97eb2f49e269a0238d41d5a90e2e/gfx/favicon.ico",
+    icon: "https://www.eventim.com.br/obj/media/BR-eventim/specialLogos/favicons/favicon-32x32.png",
   },
 };
 
