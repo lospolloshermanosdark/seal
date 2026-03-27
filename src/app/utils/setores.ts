@@ -37,7 +37,7 @@ export const eventosSeal = {
         highlight: true,
         prices: {
           meia: capPrice(497.5),
-          itau: capPrice(845.75),
+          itau: capPrice(815.75),
           inteira: capPrice(995), // 🔥 vira 990
         },
       },
@@ -46,7 +46,7 @@ export const eventosSeal = {
         nome: "Camarote A",
         prices: {
           meia: capPrice(647.5),
-          itau: capPrice(1100.75), // 🔥 vira 990
+          itau: capPrice(880), // 🔥 vira 990
           inteira: capPrice(1295), // 🔥 vira 990
         },
       },
@@ -82,9 +82,9 @@ export const eventosSeal = {
         nome: "Cadeira Diamond",
         highlight: true,
         prices: {
-          meia: capPrice(547.5),
-          itau: capPrice(930.75),
-          inteira: capPrice(1095), // 🔥 vira 990
+          meia: capPrice(445),
+          itau: capPrice(769),
+          inteira: capPrice(890), // 🔥 vira 990
         },
       },
       {
@@ -92,8 +92,8 @@ export const eventosSeal = {
         nome: "Cadeira VIP",
         highlight: true,
         prices: {
-          meia: capPrice(897.5),
-          itau: capPrice(1525.75), // 🔥 vira 990
+          meia: capPrice(495),
+          itau: capPrice(890), // 🔥 vira 990
           inteira: capPrice(1795), // 🔥 vira 990
         },
       },
