@@ -3337,7 +3337,7 @@ html:not(.iframe) .overflow-hidden {
 }
 
 .u-no-margin-top-on-tablet {
-    margin-top: 12px
+    margin-top: 0
 }
 
 @media (min-width: 660px) {
@@ -3358,7 +3358,7 @@ html:not(.iframe) .overflow-hidden {
     }
 
     .u-m-margin-bottom-on-desktop {
-        margin-bottom: 12px
+        margin-bottom: 0
     }
 }
 

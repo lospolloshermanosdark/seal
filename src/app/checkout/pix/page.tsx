@@ -193,119 +193,247 @@ const startPolling = (pixId: string) => {
 
   return (
     <>
-      <link rel="stylesheet" href="/eventim/css/patterns.css" />
-      <link rel="stylesheet" href="/eventim/css/checkout.css" />
+ <div style={{ background: "#f3f4f7", minHeight: "100vh" }}>
+  <HeaderCheckout />
 
-      <div className="checkout-wrapper-container" style={{ background: "#f3f4f7" }}>
-        <div className="wrapper wrapper-container">
-          <HeaderCheckout />
+  {/* HERO */}
+  <div
+    style={{
+      background: "linear-gradient(135deg, #202867, #2a3485)",
+      color: "#fff",
+      padding: "30px 20px",
+      textAlign: "center",
+    }}
+  >
+    <h1 style={{ fontSize: 26, fontWeight: 700 }}>
+      Finalize seu pagamento
+    </h1>
 
-          <div className="row card standard-gray-shadow theme-content-bg" style={{ marginTop: 40, padding: 24, borderRadius: 16 }}>
-            <div className="card-content">
+    <p style={{ marginTop: 6, opacity: 0.8 }}>
+      Pedido #{externalRefRef.current}
+    </p>
 
-              <h2 className="selection-list-headline u-font-weight-bold">
-                Pague com PIX
-              </h2>
+    <div style={{ marginTop: 12, fontSize: 32, fontWeight: 800 }}>
+      R$ {formatBR(amount)}
+    </div>
+  </div>
 
-              <div className="order-tag">
-                Pedido: <strong>{externalRefRef.current}</strong>
-              </div>
+  {/* CONTAINER */}
+  <div
+    style={{
+      maxWidth: 1100,
+      margin: "0 auto",
+      marginTop: -30,
+      padding: 20,
+      display: "flex",
+      gap: 20,
+      flexWrap: "wrap",
+    }}
+  >
+    {/* PIX CARD */}
+    <div
+      style={{
+        flex: 1,
+        minWidth: 340,
+        background: "#fff",
+        borderRadius: 12,
+        padding: 28,
+        boxShadow: "0 20px 50px rgba(33, 34, 97, 0.08)",
+        textAlign: "center",
+      }}
+    >
+      <div style={{display: "flex", flexDirection: "column", justifyItems: "center", justifyContent: "center", gap: "12px", alignItems: "center", width: "100%", fontSize: 22, fontWeight: 700 }}>
+        <img src="/pix.png" width={60} alt="" />
+       <span>  Pague com PIX</span>
+      </div>
 
-              <p style={{ marginTop: 10, textAlign: "center" }}>
-                {title} — <strong>R$ {formatBR(amount)}</strong>
-              </p>
+      <p style={{ fontSize: 14, color: "#6b7280", marginTop: 6 }}>
+        Copie o código ou escaneie o QR Code
+      </p>
 
-              <div className="pix-wrapper">
+      {/* TIMER */}
+      <div
+        style={{
+          marginTop: 14,
+          padding: "8px 12px",
+          background: "#fff7ed",
+          borderRadius: 8,
+          fontSize: 13,
+          color: "#ea580c",
+          fontWeight: 600,
+        }}
+      >
+        ⏱ Expira em 10 minutos
+      </div>
 
-                {/* PIX */}
-                <div className="pix-card">
-                  {loading ? (
-                    <div className="spinner-wrapper">
-                      <div className="spinner-circle-checkout"></div>
-                      <div className="spinner-message-checkout">
-                        Gerando PIX…
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      {qrImage && <img src={qrImage} className="qr-img" style={{margin: "0 auto"}} />}
+      {loading ? (
+        <div style={{ marginTop: 30 }}>
+          <div className="spinner-circle-checkout"></div>
+          <p>Gerando pagamento…</p>
+        </div>
+      ) : (
+        <>
+          {/* QR */}
+          {qrImage && (
+            <img
+              src={qrImage}
+              style={{
+                width: 240,
+                margin: "20px auto",
+                borderRadius: 12,
+                boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+              }}
+            />
+          )}
 
-                      <textarea
-                        readOnly
-                        value={pixData?.pix?.qrcode ?? ""}
-                        style={{
-                          width: "100%",
-                          marginTop: 15,
-                          padding: 12,
-                          height: 110,
-                          borderRadius: 8,
-                          border: "1px solid #ccc",
-                        }}
-                      />
-
-                      <button
-                        className="btn btn-primary btn-lg btn-block"
-                        style={{ marginTop: 12 }}
-                        onClick={() => {
-                          navigator.clipboard.writeText(pixData?.pix?.qrcode ?? "");
-                          setCopied(true);
-                          setTimeout(() => setCopied(false), 2000);
-                        }}
-                      >
-                        {copied ? "Copiado!" : "Copiar PIX"}
-                      </button>
-
-                      <p style={{ marginTop: 10, textAlign: "center" }}>
-                        {paid ? "Pagamento confirmado!" : "Aguardando pagamento…"}
-                      </p>
-                    </>
-                  )}
-                </div>
-
-                {/* RESUMO */}
-                <div className="pix-card">
-                  <h3 style={{ fontSize: 20, fontWeight: 700 }}>
-                    Resumo do Pedido
-                  </h3>
-
-                  <div className="summary-line">
-                    {title} — {cart?.quantity} unidade(s)
-                  </div>
-
-                  <div style={{
-                    marginTop: 14,
-                    display: "flex",
-                    justifyContent: "space-between",
-                    fontSize: 18,
-                    fontWeight: 600,
-                  }}>
-                    <span>Total</span>
-                    <span>R$ {formatBR(amount)}</span>
-                  </div>
-
-                  <button
-                    onClick={() => router.push("/checkout")}
-                    className="btn btn-default btn-lg btn-block"
-                    style={{ marginTop: 20 }}
-                  >
-                    Voltar
-                  </button>
-                </div>
-
-              </div>
-
-              {error && (
-                <div style={{ marginTop: 14, color: "red", textAlign: "center" }}>
-                  {error}
-                </div>
-              )}
-
-            </div>
+          {/* COPY BOX */}
+          <div
+            style={{
+              marginTop: 10,
+              background: "#f9fafb",
+              border: "1px solid #e5e7eb",
+              borderRadius: 12,
+              padding: 12,
+            }}
+          >
+            <textarea
+              readOnly
+              value={pixData?.pix?.qrcode ?? ""}
+              style={{
+                width: "100%",
+                height: 80,
+                border: "none",
+                resize: "none",
+                background: "transparent",
+                fontSize: 12,
+              }}
+            />
           </div>
 
-          <FooterEventim />
+          {/* BUTTON */}
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(
+                pixData?.pix?.qrcode ?? ""
+              );
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
+            }}
+            style={{
+              marginTop: 14,
+              width: "100%",
+              padding: "16px",
+              borderRadius: 12,
+              border: "none",
+              fontSize: 16,
+              fontWeight: 700,
+              cursor: "pointer",
+              background: copied ? "#16a34a" : "#111827",
+              color: "#fff",
+            }}
+          >
+            {copied ? "✅ Código copiado" : "Copiar código PIX"}
+          </button>
+
+          {/* STATUS */}
+          <div style={{ marginTop: 14 }}>
+            {paid ? (
+              <span style={{ color: "#16a34a", fontWeight: 700 }}>
+                ✔ Pagamento confirmado
+              </span>
+            ) : (
+              <span style={{ color: "#f59e0b", fontWeight: 600 }}>
+                Aguardando pagamento…
+              </span>
+            )}
+          </div>
+
+          {/* PROVA SOCIAL */}
+          <p
+            style={{
+              marginTop: 14,
+              fontSize: 12,
+              color: "#6b7280",
+            }}
+          >
+            🔒 Ambiente seguro • Mais de 10.000 ingressos vendidos hoje
+          </p>
+        </>
+      )}
+    </div>
+
+    {/* RESUMO + CONFIANÇA */}
+    <div
+      style={{
+        width: "100%",
+        background: "#fff",
+        borderRadius: 18,
+        padding: 24,
+        boxShadow: "0 20px 50px rgba(0,0,0,0.08)",
+      }}
+    >
+      <h3 style={{ fontSize: 20, fontWeight: 700 }}>
+        Resumo do pedido
+      </h3>
+
+      <div style={{ marginTop: 16 }}>
+        <div style={{ fontWeight: 600 }}>{title}</div>
+        <div style={{ fontSize: 13, color: "#6b7280" }}>
+          {cart?.quantity} ingresso(s)
         </div>
       </div>
+
+      <div
+        style={{
+          marginTop: 18,
+          paddingTop: 12,
+          borderTop: "1px solid #e5e7eb",
+          display: "flex",
+          justifyContent: "space-between",
+          fontWeight: 700,
+          fontSize: 18,
+        }}
+      >
+        <span>Total</span>
+        <span>R$ {formatBR(amount)}</span>
+      </div>
+
+      {/* SEGURANÇA */}
+      <div
+        style={{
+          marginTop: 20,
+          background: "#f9fafb",
+          padding: 14,
+          borderRadius: 10,
+          fontSize: 13,
+          color: "#374151",
+        }}
+      >
+        🔐 Compra 100% segura  
+        <br />📩 Ingresso enviado por e-mail  
+        <br />⚡ Confirmação imediata
+      </div>
+
+      <button
+        onClick={() => router.push("/checkout")}
+        style={{
+          marginTop: 20,
+          width: "100%",
+          padding: "12px",
+          borderRadius: 10,
+          border: "1px solid #d1d5db",
+          background: "#fff",
+          fontWeight: 600,
+          cursor: "pointer",
+        }}
+      >
+        ← Voltar
+      </button>
+    </div>
+  </div>
+
+  <FooterEventim />
+</div>
     </>
   );
 }

@@ -34,7 +34,7 @@ export async function POST(req: Request) {
       console.warn("Gateway principal falhou, tentando fallback...");
 
       // fallback automático
-      const fallback = getPixGateway("blackcat");
+      const fallback = getPixGateway("pagloop");
       normalized = await fallback.create(body);
     }
 
